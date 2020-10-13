@@ -55,7 +55,7 @@ def log_softmax(x):
     return out
 
 def reduce_sum(x):
-    out = tensor([1,1],NM.get('reduce_sum'),'reduce_sum',[x])
+    out = tensor([1,1], NM.get('reduce_sum'), 'reduce_sum', [x])
     x.output_list.append(out)
     return out
 
