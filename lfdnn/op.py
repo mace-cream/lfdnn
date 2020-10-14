@@ -51,7 +51,7 @@ def softmax(x):
 def log_softmax(x):
     # we found that np.log(softmax(x)) have serious numerical issue.
     # therefore we define log_softmax() specifically.
-    out = tensor(x.shape,NM.get('log_softmax'), 'log_softmax', [x])
+    out = tensor(x.shape, NM.get('log_softmax'), 'log_softmax', [x])
     x.output_list.append(out)
     return out
 
@@ -73,7 +73,7 @@ def reduce_mean(x):
     return out
 
 def CE(x,y):
-    out = scale(reduce_mean(product(y,log(x))), -1)
+    out = scale(reduce_mean(product(y, log(x))), -1)
     return out
 
 def CE_with_logit(x,y):
