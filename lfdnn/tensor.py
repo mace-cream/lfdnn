@@ -18,6 +18,12 @@ class tensor(object):
         '''
         return self.eval(feed)
 
+    def differentiate(self, variable, feed):
+        '''
+        calculate the derivate about `variable` at the given feed data
+        '''
+        return variable.back(self, feed)
+
     def eval(self, feed):
         '''
         Define the forward computation given input 'feed'
@@ -65,7 +71,7 @@ class tensor(object):
 
     def back(self, target, feed):
         '''
-        Define the gradient back propgation with respect to 'target' given input 'feed'
+        Define the gradient back propagation with respect to 'target' given input 'feed'
         '''
         if self.name+'_g' in feed.keys():
             return feed[self.name+'_g']
@@ -187,6 +193,9 @@ class Graph(object):
         self.initWeight()
 
     def construct_model(self, config):
+        '''
+        this function should be overridden to provide actual construction code
+        '''
         self.weight = {}
         self.weight_value = {}
         self.loss = None
