@@ -2,6 +2,7 @@ import numpy as np
 import os
 from lfdnn.utils import _sigmoid, _softmax
 
+from lfdnn.utils import TensorOpUndefinedError, TensorOpNotSupported
 
 class tensor(object):
     def __init__(self, shape, name, op_type=None, input_list=None, value=None):
@@ -24,9 +25,7 @@ class tensor(object):
         if self.name in feed.keys():
             return feed[self.name]
         if self.op_type is None:
-            result = feed[self.name]
-        elif self.op_type is 'Constant':
-            result = self.value
+            raise TensorOpUndefinedError('tensor.op_type not defined')
         elif self.op_type == 'matmul':
             result = np.matmul(self.input_list[0].eval(
                 feed), self.input_list[1].eval(feed))
@@ -58,23 +57,8 @@ class tensor(object):
         elif self.op_type == 'accuracy':
             result = np.mean(np.argmax(self.input_list[0].eval(
                 feed), -1) == np.argmax(self.input_list[1].eval(feed), -1))
-        elif self.op_type == 'imagePadding':
-            pad_size = int(self.input_list[1])
-            result = np.pad(self.input_list[0].eval(feed), ((
-                0, 0), (pad_size, pad_size), (pad_size, pad_size), (0, 0)), 'constant')
-        elif self.op_type == 'imageZIP':
-            kernel_size, stride = self.input_list[1], self.input_list[2]
-            pad = int((kernel_size-1)/2)
-            value = self.input_list[0].eval(feed)
-            zipped = []
-            for i in range(pad, self.input_list[0].shape[1]-pad, stride):
-                for j in range(pad, self.input_list[0].shape[2]-pad, stride):
-                    zipped.append(
-                        value[:, i-pad:i+pad+1, j-pad:j+pad+1, :].reshape((self.input_list[0].shape[0], -1)))
-            result = np.stack(zipped, 0).transpose(
-                (1, 0, 2)).reshape(self.shape)
-        elif self.op_type == 'reshape':
-            result = self.input_list[0].eval(feed).reshape(self.input_list[1])
+        else:
+            raise TensorOpNotSupported('Unsupported operator type: ' + self.op_type)
 
         feed.update({self.name: result})
         return result
