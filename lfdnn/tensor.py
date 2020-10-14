@@ -2,6 +2,7 @@ import numpy as np
 import os
 from lfdnn.utils import _sigmoid, _softmax
 
+from lfdnn.utils import one_hot
 from lfdnn.utils import TensorOpUndefinedError, TensorOpNotSupported
 
 class tensor(object):
@@ -189,7 +190,12 @@ class NameManager(object):
 
 class Graph(object):
     def __init__(self, config):
+        self.epoch_num = config['EpochNum']
+        self.lr = config['LearningRate']
+        self.input = None
+        self.label = None
         self.construct_model(config)
+        self.batch_size = self.input.shape[0]
         self.initWeight()
 
     def construct_model(self, config):
@@ -215,7 +221,18 @@ class Graph(object):
             path = path + '.npz'
         self.weight_value = dict(np.load(path))
 
-    def update(self, feed, lr):
+    def update(self, feed):
         gradient = {k: v.back(self.loss, feed) for k, v in self.weight.items()}
         self.weight_value.update({
-            k: self.weight_value[k]-lr*gradient[k] for k in self.weight.keys()})
+            k: self.weight_value[k]- self.lr * gradient[k] for k in self.weight.keys()})
+
+    def train(self, x_train, y_train):
+        OutputDim = self.label[-1]
+        for e in range(self.epoch_num):
+            counter = 0
+            while counter + self.batch_size <= x_train.shape[0]:
+                x_batch = x_train[counter: counter + self.batch_size].reshape([self.batch_size, -1])
+                y_batch = one_hot(y_train[counter: counter + self.batch_size], OutputDim)
+                feed = {self.input.name: x_batch, self.label.name: y_batch}
+                self.update(feed)
+                counter += self.batch_size
