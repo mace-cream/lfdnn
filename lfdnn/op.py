@@ -1,4 +1,4 @@
-from lfdnn.main import tensor,NameManager
+from lfdnn.tensor import tensor, NameManager
 import numpy as np
 
 NM = NameManager()
