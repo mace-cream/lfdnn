@@ -195,9 +195,12 @@ class Graph(object):
         self.batch_size = batch_size
         self.weight = {}
         self.weight_value = {}
+        # the following members should be defined to proper tensor in `construct_model`
         self.input = None
-        self.label = None
+        self.output = None # y_predict
+        self.label = None # y_train input
         self.loss = None
+        self.accuracy = None
 
     def construct_model(self, x_train, y_train):
         '''
@@ -225,15 +228,23 @@ class Graph(object):
         self.weight_value.update({
             k: self.weight_value[k]- self.learning_rate * gradient[k] for k in self.weight.keys()})
 
+    def predict(self, x_test):
+        feed = {self.input.name:  x_test}
+        return self.output.eval(feed)
+
     def train(self, x_train, y_train):
         self.construct_model(x_train, y_train)
         self.initWeight()
         OutputDim = self.label[-1]
-        for e in range(self.epoch_num):
+        accuracy_train = []
+        loss = []
+        for _ in range(self.epoch_num):
             counter = 0
             while counter + self.batch_size <= x_train.shape[0]:
                 x_batch = x_train[counter: counter + self.batch_size].reshape([self.batch_size, -1])
                 y_batch = one_hot(y_train[counter: counter + self.batch_size], OutputDim)
                 feed = {self.input.name: x_batch, self.label.name: y_batch}
+                accuracy_train.append(self.accuracy.eval(feed))
+                loss.append(self.loss.eval(feed))
                 self.update(feed)
                 counter += self.batch_size

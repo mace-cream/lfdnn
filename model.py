@@ -51,9 +51,9 @@ class MLP(lfdnn.Graph):
         b = lfdnn.tensor([1, OutputDim], 'OutputBias')
         self.weight['OutputBias'] = b
         h = lfdnn.add(lfdnn.matmul(h, w), b)
-        self.out = lfdnn.softmax(h)
+        self.output = lfdnn.softmax(h)
         self.loss = lfdnn.CE_with_logit(h, self.label)
         if _lambda > 0:
             for w in self.weight.values():
                 self.loss = lfdnn.add(self.loss, lfdnn.scale(lfdnn.reduce_mean(lfdnn.product(w, w)), _lambda))
-        self.accuracy = lfdnn.accuracy(self.out, self.label)
+        self.accuracy = lfdnn.accuracy(self.output, self.label)
