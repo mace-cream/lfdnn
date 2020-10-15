@@ -2,17 +2,17 @@ import numpy as np
 import lfdnn
 
 class MLP(lfdnn.Graph):
+    '''
+        EpochNum: int, number of epochs in traning
+        BatchSize: int, batch size used in SGD, default to all data
+        InputDim: int, number of feature for each input data
+        OutputDim: int, number of classes for output label
+        LayerNum: int, number of intermediate layer
+        HiddenNum: array-like, len(HiddenNum) = LayerNum, the number of nodes at each hidden layer
+        LearningRate: double, learning rate in SGD
+        _lambda: double, regularization parameter
+    '''
     def __init__(self, **config):
-        '''
-            EpochNum: int, number of epochs in traning
-            BatchSize: int, batch size used in SGD, default to all data
-            InputDim: int, number of feature for each input data
-            OutputDim: int, number of classes for output label
-            LayerNum: int, number of intermediate layer
-            HiddenNum: array-like, len(HiddenNum) = LayerNum, the number of nodes at each hidden layer
-            LearningRate: double, learning rate in SGD
-            _lambda: double, regularization parameter
-        '''        
         if config.get('LayerNum') is None:
             config['LayerNum'] = 0
         if config.get('HiddenNum') is None:
@@ -31,8 +31,6 @@ class MLP(lfdnn.Graph):
         OutputDim = config['OutputDim']
         LayerNum = config['LayerNum']
         HiddenNum = config['HiddenNum']
-        LearningRate = config['LearningRate']
-        EpochNum = config['EpochNum']
         BatchSize = config['BatchSize']
         _lambda = config['lambda']
         if BatchSize is None:
