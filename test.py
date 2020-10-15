@@ -58,11 +58,14 @@ class TestMLP(unittest.TestCase):
         # test softmax on Iris dataset
         iris = load_iris()
         x_train = iris.data
+        batch_size = int(x_train.shape[0] / 3)
         y_train = iris.target
-        mlp = MLP(epoch_num=50)
+        mlp = MLP(epoch_num=400, batch_size=batch_size, learning_rate=0.1)
+        np.random.seed(2020)
         mlp.train(x_train, y_train)
         y_predict = mlp.predict(x_train)
-        print(numerical_accuracy(y_predict, y_train))
-
+        self.assertTrue(numerical_accuracy(y_predict, y_train) > 0.95)
+        # save the results for plotting
+        
 if __name__=="__main__":
     unittest.main()
