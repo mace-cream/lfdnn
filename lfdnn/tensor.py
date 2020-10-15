@@ -230,6 +230,7 @@ class Graph(object):
 
     def predict(self, x_test):
         feed = {self.input.name:  x_test}
+        feed.update(self.weight_value)
         return self.output.eval(feed)
 
     def train(self, x_train, y_train):

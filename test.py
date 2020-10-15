@@ -2,11 +2,13 @@ import unittest
 import copy
 
 import numpy as np
+from sklearn.datasets import load_iris
 
 from lfdnn import tensor
 from lfdnn import sigmoid, add, reduce_mean, product, matmul, CE_with_logit, scale
 
 from lfdnn.utils import TensorOpUndefinedError, TensorOpNotSupported
+from lfdnn.numerical_tensor import numerical_accuracy
 
 from model import MLP
 
@@ -37,6 +39,13 @@ class TestAutoDifferential(unittest.TestCase):
         with self.assertRaises(TensorOpNotSupported):
             a.forward(feed)
 
+    def test_numerical_accuracy(self):
+        prob_vector = np.array([[0.3, 0.7], [0.6, 0.4]])
+        true_vector = [1, 1]
+        self.assertAlmostEqual(numerical_accuracy(prob_vector, true_vector), 0.5)
+        true_vector = [1, 0]
+        self.assertAlmostEqual(numerical_accuracy(prob_vector, true_vector), 1.0)
+
 class TestMLP(unittest.TestCase):
     def test_construction_model(self):
         mlp = MLP()
@@ -45,6 +54,15 @@ class TestMLP(unittest.TestCase):
         x_train = np.zeros([3, 2])
         y_train = [1, 0, 1]
         mlp.train(x_train, y_train)
+    def test_iris(self):
+        # test softmax on Iris dataset
+        iris = load_iris()
+        x_train = iris.data
+        y_train = iris.target
+        mlp = MLP(epoch_num=50)
+        mlp.train(x_train, y_train)
+        y_predict = mlp.predict(x_train)
+        print(numerical_accuracy(y_predict, y_train))
 
 if __name__=="__main__":
     unittest.main()
