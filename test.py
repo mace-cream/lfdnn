@@ -8,6 +8,8 @@ from lfdnn import sigmoid, add, reduce_mean, product, matmul, CE_with_logit, sca
 
 from lfdnn.utils import TensorOpUndefinedError, TensorOpNotSupported
 
+from model import MLP
+
 class TestAutoDifferential(unittest.TestCase):
     def test_shape(self):
         a = tensor([1, 2], 'a')
@@ -34,6 +36,10 @@ class TestAutoDifferential(unittest.TestCase):
         feed = {'b': np.array([[5, 6]])}
         with self.assertRaises(TensorOpNotSupported):
             a.forward(feed)
+
+class TestMLP(unittest.TestCase):
+    def test_construction(self):
+        mlp = MLP()
 
 if __name__=="__main__":
     unittest.main()

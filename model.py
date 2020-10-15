@@ -12,31 +12,23 @@ class MLP(lfdnn.Graph):
         LearningRate: double, learning rate in SGD
         _lambda: double, regularization parameter
     '''
-    def __init__(self, **config):
-        if config.get('LayerNum') is None:
-            config['LayerNum'] = 0
-        if config.get('HiddenNum') is None:
-            config['HiddenNum'] = []
-        if config.get('LearningRate') is None:
-            config['LearningRate'] = 0.05
-        if config.get('EpochNum') is None:
-            config['EpochNum'] = 1
-        if config.get('lambda') is None:
-            config['lambda'] = 0
-        config['BatchSize'] = config.get('BatchSize')
-        super().__init__(config)
+    def __init__(self, learning_rate=0.05, epoch_num=1, batch_size='auto', hidden_layer_sizes=(), _lambda=0):
+        self.hidden_layer_sizes = hidden_layer_sizes
+        self._lambda = _lambda
+        super().__init__(learning_rate=learning_rate, epoch_num=epoch_num, batch_size=batch_size)
 
-    def construct_model(self, config):
-        InputDim = config['InputDim']
-        OutputDim = config['OutputDim']
-        LayerNum = config['LayerNum']
-        HiddenNum = config['HiddenNum']
-        BatchSize = config['BatchSize']
-        _lambda = config['lambda']
-        if BatchSize is None:
+    def construct_model(self, x_train, y_train):
+        # get number of features
+        InputDim = x_train.shape[-1]
+        # get number of classes
+        OutputDim = len(np.unique(y_train))
+        LayerNum = len(self.hidden_layer_sizes)
+        HiddenNum = self.hidden_layer_sizes
+        BatchSize = self.batch_size
+        _lambda = self._lambda
+        if BatchSize == 'auto':
             BatchSize = InputDim
-        self.weight = {}
-        self.weight_value = {}
+
         self.input = lfdnn.tensor([BatchSize, InputDim], 'Input')
         self.label = lfdnn.tensor([BatchSize, OutputDim], 'Label')
         h = self.input

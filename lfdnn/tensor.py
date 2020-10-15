@@ -189,22 +189,21 @@ class NameManager(object):
 
 
 class Graph(object):
-    def __init__(self, config):
-        self.epoch_num = config['EpochNum']
-        self.lr = config['LearningRate']
+    def __init__(self, learning_rate=0.05, epoch_num=1, batch_size='auto'):
+        self.learning_rate = learning_rate
+        self.epoch_num = epoch_num
+        self.batch_size = batch_size
+        self.weight = {}
+        self.weight_value = {}
         self.input = None
         self.label = None
-        self.construct_model(config)
-        self.batch_size = self.input.shape[0]
-        self.initWeight()
+        self.loss = None
 
-    def construct_model(self, config):
+    def construct_model(self, x_train, y_train):
         '''
         this function should be overridden to provide actual construction code
         '''
-        self.weight = {}
-        self.weight_value = {}
-        self.loss = None
+        raise NotImplementedError("base class function `construct_model` not callable")
 
     def initWeight(self, initializer=np.random.standard_normal):
         self.weight_value = {k: initializer(
@@ -224,9 +223,11 @@ class Graph(object):
     def update(self, feed):
         gradient = {k: v.back(self.loss, feed) for k, v in self.weight.items()}
         self.weight_value.update({
-            k: self.weight_value[k]- self.lr * gradient[k] for k in self.weight.keys()})
+            k: self.weight_value[k]- self.learning_rate * gradient[k] for k in self.weight.keys()})
 
     def train(self, x_train, y_train):
+        self.construct_model(x_train, y_train)
+        self.initWeight()
         OutputDim = self.label[-1]
         for e in range(self.epoch_num):
             counter = 0
