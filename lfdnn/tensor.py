@@ -235,16 +235,17 @@ class Graph(object):
     def train(self, x_train, y_train):
         self.construct_model(x_train, y_train)
         self.initWeight()
-        OutputDim = self.label[-1]
+        OutputDim = self.label.shape[-1]
+        batch_size = self.input.shape[0]
         accuracy_train = []
         loss = []
         for _ in range(self.epoch_num):
             counter = 0
-            while counter + self.batch_size <= x_train.shape[0]:
-                x_batch = x_train[counter: counter + self.batch_size].reshape([self.batch_size, -1])
-                y_batch = one_hot(y_train[counter: counter + self.batch_size], OutputDim)
+            while counter + batch_size < x_train.shape[0]:
+                x_batch = x_train[counter: counter + batch_size].reshape([batch_size, -1])
+                y_batch = one_hot(y_train[counter: counter + batch_size], OutputDim)
                 feed = {self.input.name: x_batch, self.label.name: y_batch}
                 accuracy_train.append(self.accuracy.eval(feed))
                 loss.append(self.loss.eval(feed))
                 self.update(feed)
-                counter += self.batch_size
+                counter += batch_size

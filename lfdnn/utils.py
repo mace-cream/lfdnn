@@ -8,9 +8,10 @@ class TensorOpNotSupported(Exception):
     pass
 
 def one_hot(x, depth):
-    result = np.matmul(np.ones((x.shape[0], 1)), np.arange(depth).reshape((1, depth)))
-    x = np.matmul(x.reshape((x.shape[0], 1)), np.ones((1, depth)))
-    return (result == x) * 1.0
+    x_inner = np.array(x)
+    result = np.matmul(np.ones((x_inner.shape[0], 1)), np.arange(depth).reshape((1, depth)))
+    x_inner = np.matmul(x_inner.reshape((x_inner.shape[0], 1)), np.ones((1, depth)))
+    return (result == x_inner) * 1.0
 
 def _sigmoid(x):
     return 1 / (1 + np.exp(-x))

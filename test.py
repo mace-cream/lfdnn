@@ -38,8 +38,13 @@ class TestAutoDifferential(unittest.TestCase):
             a.forward(feed)
 
 class TestMLP(unittest.TestCase):
-    def test_construction(self):
+    def test_construction_model(self):
         mlp = MLP()
+        # number of data = 3
+        # number of feature = 2
+        x_train = np.zeros([3, 2])
+        y_train = [1, 0, 1]
+        mlp.train(x_train, y_train)
 
 if __name__=="__main__":
     unittest.main()
