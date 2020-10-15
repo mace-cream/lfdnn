@@ -241,10 +241,11 @@ class Graph(object):
         loss = []
         for _ in range(self.epoch_num):
             counter = 0
-            while counter + batch_size < x_train.shape[0]:
+            while counter + batch_size <= x_train.shape[0]:
                 x_batch = x_train[counter: counter + batch_size].reshape([batch_size, -1])
                 y_batch = one_hot(y_train[counter: counter + batch_size], OutputDim)
                 feed = {self.input.name: x_batch, self.label.name: y_batch}
+                feed.update(self.weight_value)
                 accuracy_train.append(self.accuracy.eval(feed))
                 loss.append(self.loss.eval(feed))
                 self.update(feed)
