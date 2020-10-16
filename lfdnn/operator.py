@@ -20,6 +20,15 @@ class matmul(tensor):
                 feed), self.input_list[1].eval(feed))
         feed.update({self.name: result})
         return result
+    def _derivative(self, feed, input, target):
+        gradient = 0
+        if input is self.input_list[0]:
+            gradient = np.matmul(self.back(target, feed),
+                            self.input_list[1].eval(feed).T)
+        if input is self.input_list[1]:
+            gradient += np.matmul(self.input_list[0].eval(
+                    feed).T, self.back(target, feed))
+        return gradient
 
 class add(tensor):
     def __init__(self, x1, x2):
@@ -32,7 +41,18 @@ class add(tensor):
                  self.input_list[1].eval(feed)
         feed.update({self.name: result})
         return result
-
+    def _derivative(self, feed, input, target):
+        dim_difference = len(self.shape) - len(input.shape)
+        boardcast_dim = [i for i in range(dim_difference)] + [i for i in range(
+            dim_difference, len(self.shape)) if input.shape[i - dim_difference] == 1]
+        gradient = 0
+        if input is self.input_list[0]:
+            gradient = np.sum(self.back(target, feed), tuple(
+                    boardcast_dim)).reshape(input.shape)
+        if input is self.input_list[1]:
+            gradient += np.sum(self.back(target, feed), tuple(
+                    boardcast_dim)).reshape(input.shape)
+        return gradient
 
 class sigmoid(tensor):
     def __init__(self, x):
@@ -70,7 +90,9 @@ class log(tensor):
         result = np.log(self.input_list[0].eval(feed))
         feed.update({self.name: result})
         return result
-    
+    def _derivative(self, feed, input, target):
+        return 1 / input.eval(feed) * self.back(target, feed)
+
 class product(tensor):
     '''
     elementwise multiplication of two tensors
@@ -129,6 +151,8 @@ class reduce_sum(tensor):
         result = np.sum(self.input_list[0].eval(feed))
         feed.update({self.name: result})
         return result
+    def _derivative(self, feed, input, target):
+        return np.ones(input.shape) * self.back(target, feed)
 
 class scale(tensor):
     '''multiply a tensor x by a scalar alpha
@@ -145,6 +169,8 @@ class scale(tensor):
         result = self.input_list[1] * self.input_list[0].eval(feed)
         feed.update({self.name: result})
         return result
+    def _derivative(self, feed, input, target):
+        return self.input_list[1] * self.back(target, feed)
 
 def reduce_mean(x):
     '''mean value of x along axis = 0

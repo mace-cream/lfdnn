@@ -45,14 +45,7 @@ class tensor(object):
         gradient = 0
         for out in self.output_list:
             if out.op_type == 'matmul':
-                if self is out.input_list[0]:
-                    gradient = gradient + \
-                        np.matmul(out.back(target, feed),
-                                  out.input_list[1].eval(feed).T)
-                if self is out.input_list[1]:
-                    gradient = gradient + \
-                        np.matmul(out.input_list[0].eval(
-                            feed).T, out.back(target, feed))
+                gradient = gradient + out._derivative(feed, self, target)
             elif out.op_type == 'sigmoid':                
                 gradient = gradient + out._derivative(feed, self, target)
             elif out.op_type == 'relu':
@@ -83,56 +76,19 @@ class tensor(object):
                 local_gradient = np.concatenate(local_gradient, 0)
                 gradient = gradient + local_gradient
             elif out.op_type == 'add':
-                dim_difference = len(out.shape)-len(self.shape)
-                boardcast_dim = [i for i in range(dim_difference)] + [i for i in range(
-                    dim_difference, len(out.shape)) if self.shape[i-dim_difference] == 1]
-                if self is out.input_list[0]:
-                    gradient = gradient + \
-                        np.sum(out.back(target, feed), tuple(
-                            boardcast_dim)).reshape(self.shape)
-                if self is out.input_list[1]:
-                    gradient = gradient + \
-                        np.sum(out.back(target, feed), tuple(
-                            boardcast_dim)).reshape(self.shape)
-                     
+                gradient = gradient + out._derivative(feed, self, target) 
             elif out.op_type == 'log':
-                gradient = gradient + 1/self.eval(feed)*out.back(target, feed)
+                gradient = gradient + out._derivative(feed, self, target)
             elif out.op_type == 'product':
-                if self is out.input_list[0]:
-                    gradient = gradient + \
-                        out.back(target, feed)*out.input_list[1].eval(feed)
-                if self is out.input_list[1]:
-                    gradient = gradient + \
-                        out.back(target, feed)*out.input_list[0].eval(feed)
+                gradient = gradient + out._derivative(feed, self, target)
             elif out.op_type == 'reduce_sum':
-                gradient = gradient + \
-                    np.ones(self.shape)*out.back(target, feed)
+                gradient = gradient + out._derivative(feed, self, target)
             elif out.op_type == 'scale':
-                gradient = gradient + out.input_list[1]*out.back(target, feed)
-            elif out.op_type == 'imagePadding':
-                gradient = gradient + out.back(target, feed)[
-                    :, out.input_list[1]:-out.input_list[1], out.input_list[1]:-out.input_list[1], :]
-            elif out.op_type == 'imageZIP':
-                forward_gradient = out.back(target, feed).reshape(
-                    (self.shape[0], -1, out.shape[-1])).transpose((1, 0, 2))
-                sub_gradient = np.zeros(self.shape)
-                kernel_size, stride = out.input_list[1], out.input_list[2]
-                pad = int((kernel_size-1)/2)
-                counter = 0
-                for i in range(pad, self.shape[1]-pad, stride):
-                    for j in range(pad, self.shape[2]-pad, stride):
-                        sub_gradient[:, i-pad:i+pad+1, j-pad:j+pad+1, :] += forward_gradient[counter].reshape(
-                            (self.shape[0], kernel_size, kernel_size, -1))
-                        counter = counter + 1
-                gradient = gradient + sub_gradient
-            elif out.op_type == 'reshape':
-                gradient = gradient + \
-                    out.back(target, feed).reshape(self.shape)
-
-            elif out.op_type in ['accuracy']:
+                gradient = gradient + out._derivative(feed, self, target)
+            elif out.op_type == 'accuracy':
                 pass
             else:
-                raise TensorOpNotSupported('Unsupported operator type: ' + self.op_type)
+                raise TensorOpNotSupported('Unsupported operator type: ' + out.op_type)
         feed.update({self.name+'_g': gradient})
         return gradient
 
