@@ -1,7 +1,7 @@
 import numpy as np
 import os
-from lfdnn.utils import _sigmoid, _softmax
 
+from lfdnn.utils import _sigmoid, _softmax
 from lfdnn.utils import one_hot
 from lfdnn.utils import TensorOpUndefinedError, TensorOpNotSupported
 
@@ -35,6 +35,9 @@ class tensor(object):
             raise TensorOpUndefinedError('tensor.op_type not defined')
         raise TensorOpNotSupported('Unsupported operator type: ' + self.op_type)
 
+    def _derivative(self, feed, input, target):
+        return 0
+
     def back(self, target, feed):
         '''Define the gradient back propagation with respect to 'target' given input 'feed'
         '''
@@ -44,30 +47,8 @@ class tensor(object):
             return np.ones(self.shape)
         gradient = 0
         for out in self.output_list:
-            if out.op_type == 'matmul':
-                gradient = gradient + out._derivative(feed, self, target)
-            elif out.op_type == 'sigmoid':                
-                gradient = gradient + out._derivative(feed, self, target)
-            elif out.op_type == 'relu':
-                gradient = gradient + out._derivative(feed, self, target)
-            elif out.op_type == 'softmax':
-                pass
-            elif out.op_type == 'log_softmax':
-                gradient = gradient + out._derivative(feed, self, target) 
-            elif out.op_type == 'add':
-                gradient = gradient + out._derivative(feed, self, target) 
-            elif out.op_type == 'log':
-                gradient = gradient + out._derivative(feed, self, target)
-            elif out.op_type == 'product':
-                gradient = gradient + out._derivative(feed, self, target)
-            elif out.op_type == 'reduce_sum':
-                gradient = gradient + out._derivative(feed, self, target)
-            elif out.op_type == 'scale':
-                gradient = gradient + out._derivative(feed, self, target)
-            elif out.op_type == 'accuracy':
-                pass
-            else:
-                raise TensorOpNotSupported('Unsupported operator type: ' + out.op_type)
+            gradient += out._derivative(feed, self, target)
+
         feed.update({self.name+'_g': gradient})
         return gradient
 
