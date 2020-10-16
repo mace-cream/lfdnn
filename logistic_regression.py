@@ -13,10 +13,10 @@ class Logistic:
     tol: double, optional, the stopping criteria for the weights
     max_iter: int, optional, the maximal number of iteration
     """
-    def __init__(self, tol=1e-4, max_iter=400):
+    def __init__(self, tol=1e-4, max_iter=400, learning_rate=0.1):
         self.tol = tol
         self.max_iter = max_iter
-        self.mlp = MLP(batch_size='auto', learning_rate=0.1)
+        self.mlp = MLP(batch_size='auto', learning_rate=learning_rate)
 
     def get_params(self, deep=False):
         """Get parameters for this estimator"""
@@ -25,7 +25,7 @@ class Logistic:
     def _iteration_step(self, x_train, y_train):
         self.mlp._epoch_iterate(x_train, y_train)
         weight_matrix = self.mlp.weight_value['output_weight']
-        self.theta = weight_matrix[:, 0] - weight_matrix[:, 1]
+        self.theta = weight_matrix[:, 1] - weight_matrix[:, 0]
         pass
 
     def train(self, x_train, y_train):
@@ -48,6 +48,8 @@ class Logistic:
             self._iteration_step(x_train, y_train_inner)
             if np.linalg.norm(self.theta - last_theta) < self.tol:
                 break
+        bias_vector = self.mlp.weight_value['output_bias']
+        self.intercept = bias_vector[0, 1] - bias_vector[0, 0]
         return
 
     def fit(self, x_train, y_train):

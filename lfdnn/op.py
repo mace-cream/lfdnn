@@ -75,6 +75,7 @@ def reduce_mean(x):
 def CE(x, y):
     '''
     average cross-entropy multiplied by -1
+    see the explanation: https://en.wikipedia.org/wiki/Cross_entropy#Cross-entropy_loss_function_and_logistic_regression
     '''
     out = scale(reduce_mean(product(y, log(x))), -1)
     return out
