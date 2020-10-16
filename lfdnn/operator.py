@@ -46,6 +46,10 @@ def product(x1, x2):
         x2.output_list.append(out)
     return out
 
+def square_sum(x):
+    out = reduce_mean(product(x, x))
+    return out
+
 def softmax(x):
     out = tensor(x.shape, NM.get('softmax'), 'softmax', [x])
     x.output_list.append(out)
@@ -88,7 +92,7 @@ def mse(x, y):
        mean square error
     '''
     subtract_out = add(x, scale(y, -1))
-    out = reduce_mean(product(subtract_out, subtract_out))
+    out = square_sum(subtract_out)
     return out
 
 def CE(x, y):

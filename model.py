@@ -1,14 +1,16 @@
 import numpy as np
+
 import lfdnn
+from lfdnn import operator
 
 class MLP(lfdnn.Graph):
     '''
         EpochNum: int, number of epochs in traning
         BatchSize: int, batch size used in SGD, default to all data
-        InputDim: int, number of feature for each input data
-        OutputDim: int, number of classes for output label
-        LayerNum: int, number of intermediate layer
-        HiddenNum: array-like, len(HiddenNum) = LayerNum, the number of nodes at each hidden layer
+        input_dim: int, number of feature for each input data
+        output_dim: int, number of classes for output label
+        layer_num: int, number of intermediate layer
+        hidden_layer_num: array-like, len(hidden_layer_num) = layer_num, the number of nodes at each hidden layer
         LearningRate: double, learning rate in SGD
         _lambda: double, regularization parameter
     '''
@@ -19,42 +21,43 @@ class MLP(lfdnn.Graph):
 
     def construct_model(self, x_train, y_train):
         # get number of features
-        InputDim = x_train.shape[-1]
+        input_dim = x_train.shape[-1]
         # get number of classes
-        OutputDim = len(np.unique(y_train))
-        LayerNum = len(self.hidden_layer_sizes)
-        HiddenNum = self.hidden_layer_sizes
+        output_dim = len(np.unique(y_train))
+        layer_num = len(self.hidden_layer_sizes)
+        hidden_layer_num = self.hidden_layer_sizes
         BatchSize = self.batch_size
         _lambda = self._lambda
         if BatchSize == 'auto':
             # use all data
             BatchSize = x_train.shape[0]
 
-        self.input = lfdnn.tensor([BatchSize, InputDim], 'Input')
-        self.label = lfdnn.tensor([BatchSize, OutputDim], 'Label')
+        self.input = lfdnn.tensor([BatchSize, input_dim], 'Input')
+        self.label = lfdnn.tensor([BatchSize, output_dim], 'Label')
         h = self.input
-        for i in range(LayerNum):
+        for i in range(layer_num):
             if i == 0:
-                w = lfdnn.tensor([InputDim, HiddenNum[i]], 'Weight' + str(i))
+                w = lfdnn.tensor([input_dim, hidden_layer_num[i]], 'Weight' + str(i))
                 self.weight['Weight' + str(i)] = w
             else:
-                w = lfdnn.tensor([HiddenNum[i - 1], HiddenNum[i]], 'Weight' + str(i))
+                w = lfdnn.tensor([hidden_layer_num[i - 1], hidden_layer_num[i]], 'Weight' + str(i))
                 self.weight['Weight' + str(i)] = w
-            b = lfdnn.tensor([1, HiddenNum[i]],'Bias' + str(i))
+            b = lfdnn.tensor([1, hidden_layer_num[i]],'Bias' + str(i))
             self.weight['Bias' + str(i)] = b
-            h = lfdnn.add(lfdnn.operator.matmul(h, w), b)
-            h = lfdnn.sigmoid(h)
-        if len(HiddenNum) > 0:
-            w = lfdnn.tensor([HiddenNum[-1], OutputDim], 'output_weight')
+            h = operator.add(operator.matmul(h, w), b)
+            h = operator.sigmoid(h)
+        if len(hidden_layer_num) > 0:
+            w = lfdnn.tensor([hidden_layer_num[-1], output_dim], 'output_weight')
         else:
-            w = lfdnn.tensor([InputDim, OutputDim], 'output_weight')
+            w = lfdnn.tensor([input_dim, output_dim], 'output_weight')
         self.weight['output_weight'] = w
-        b = lfdnn.tensor([1, OutputDim], 'output_bias')
+        b = lfdnn.tensor([1, output_dim], 'output_bias')
         self.weight['output_bias'] = b
-        h = lfdnn.operator.add(lfdnn.operator.matmul(h, w), b)
-        self.output = lfdnn.operator.softmax(h)
-        self.loss = lfdnn.operator.CE_with_logit(h, self.label)
+        h = operator.add(operator.matmul(h, w), b)
+        self.output = operator.softmax(h)
+        self.loss = operator.CE_with_logit(h, self.label)
         if _lambda > 0:
             for w in self.weight.values():
-                self.loss = lfdnn.operator.add(self.loss, lfdnn.operator.scale(lfdnn.operator.reduce_mean(lfdnn.operator.product(w, w)), _lambda))
-        self.accuracy = lfdnn.operator.accuracy(self.output, self.label)
+                regularization_term = operator.scale(operator.square_sum(w), _lambda)
+                self.loss = operator.add(self.loss, regularization_term)
+        self.accuracy = operator.accuracy(self.output, self.label)
