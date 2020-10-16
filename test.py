@@ -65,6 +65,10 @@ class TestAutoDifferential(unittest.TestCase):
         a = tensor([1, 3], 'a')
         feed = {'a': np.array([[1, 2, 3]])}
         assert_array_almost_equal(operator.log_softmax(a).forward(feed), operator.log(operator.softmax(a)).forward(feed))
+    def test_relu(self):
+        a = tensor([1, 3], 'a')
+        feed = {'a': np.array([[1, -1, 3]])}
+        assert_array_almost_equal(operator.relu(a).forward(feed), np.array([[1, 0, 3]]))
 
     def test_cross_entropy(self):
         x = tensor([3, 3], 'x')

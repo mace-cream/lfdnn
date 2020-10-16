@@ -33,14 +33,6 @@ class tensor(object):
             return feed[self.name]
         if self.op_type is None:
             raise TensorOpUndefinedError('tensor.op_type not defined')
-        elif self.op_type == 'matmul':
-            result = np.matmul(self.input_list[0].eval(
-                feed), self.input_list[1].eval(feed))
-        elif self.op_type == 'sigmoid':
-            result = _sigmoid(self.input_list[0].eval(feed))
-        elif self.op_type == 'relu':
-            result = self.input_list[0].eval(feed)
-            result[result < 0] = 0
         elif self.op_type == 'softmax':
             result = _softmax(self.input_list[0].eval(feed))
         elif self.op_type == 'log_softmax':
@@ -49,14 +41,6 @@ class tensor(object):
             result = logit - np.log(np.sum(np.exp(logit), 1, keepdims=True))
             if np.any(~np.isfinite(result)):
                 result = logit - np.max(logit, 1, keepdims=True)
-        elif self.op_type == 'add':
-            result = self.input_list[0].eval(
-                feed)+self.input_list[1].eval(feed)
-        elif self.op_type == 'log':
-            result = np.log(self.input_list[0].eval(feed))
-        elif self.op_type == 'product':
-            result = self.input_list[0].eval(
-                feed)*self.input_list[1].eval(feed)
         elif self.op_type == 'reduce_sum':
             result = np.sum(self.input_list[0].eval(feed))
         elif self.op_type == 'scale':

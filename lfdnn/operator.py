@@ -1,50 +1,80 @@
-from lfdnn.tensor import tensor, NameManager
 import numpy as np
+
+from lfdnn.tensor import tensor, NameManager
+from lfdnn.utils import _sigmoid, _softmax
 
 NM = NameManager()
 
-def matmul(x1, x2):
+class matmul(tensor):
     '''
         matrix multiplication
     '''
-    out = tensor(x1.shape[:-1] + x2.shape[1:],
-                 NM.get('matmul'), 'matmul', [x1, x2])
-    x1.output_list.append(out)
-    if x1 is not x2:
-        x2.output_list.append(out)
-    return out
+    def __init__(self, x1, x2):
+        super().__init__(x1.shape[:-1] + x2.shape[1:],
+                    NM.get('matmul'), 'matmul', [x1, x2])
+        x1.output_list.append(self)
+        if x1 is not x2:
+            x2.output_list.append(self)
+    def eval(self, feed):
+        result = np.matmul(self.input_list[0].eval(
+                feed), self.input_list[1].eval(feed))
+        feed.update({self.name: result})
+        return result
 
-def add(x1, x2):
-    out = tensor(x1.shape, NM.get('add'), 'add', [x1, x2])
-    x1.output_list.append(out)
-    if x1 is not x2:
-        x2.output_list.append(out)
-    return out
+class add(tensor):
+    def __init__(self, x1, x2):
+        super().__init__(x1.shape, NM.get('add'), 'add', [x1, x2])
+        x1.output_list.append(self)
+        if x1 is not x2:
+            x2.output_list.append(self)
+    def eval(self, feed):
+        result = self.input_list[0].eval(feed) +\
+                 self.input_list[1].eval(feed)
+        feed.update({self.name: result})
+        return result
 
-def sigmoid(x):
-    out = tensor(x.shape,NM.get('sigmoid'), 'sigmoid', [x])
-    x.output_list.append(out)
-    return out
+class sigmoid(tensor):
+    def __init__(self, x):
+        super().__init__(x.shape,NM.get('sigmoid'), 'sigmoid', [x])
+        x.output_list.append(self)
+    def eval(self, feed):
+        result = _sigmoid(self.input_list[0].eval(feed))
+        feed.update({self.name: result})
+        return result
 
-def relu(x):
-    out = tensor(x.shape, NM.get('relu'), 'relu', [x])
-    x.output_list.append(out)
-    return out
+class relu(tensor):
+    def __init__(self, x):
+        super().__init__(x.shape, NM.get('relu'), 'relu', [x])
+        x.output_list.append(self)
+    def eval(self, feed):
+        result = self.input_list[0].eval(feed)
+        result[result < 0] = 0
+        feed.update({self.name: result})
+        return result
 
-def log(x):
-    out = tensor(x.shape, NM.get('log'), 'log', [x])
-    x.output_list.append(out)
-    return out
-
-def product(x1, x2):
+class log(tensor):
+    def __init__(self, x):
+        super().__init__(x.shape, NM.get('log'), 'log', [x])
+        x.output_list.append(self)
+    def eval(self, feed):
+        result = np.log(self.input_list[0].eval(feed))
+        feed.update({self.name: result})
+        return result
+    
+class product(tensor):
     '''
     elementwise multiplication of two tensors
     '''
-    out = tensor(x1.shape, NM.get('product'), 'product', [x1, x2])
-    x1.output_list.append(out)
-    if x1 is not x2:
-        x2.output_list.append(out)
-    return out
+    def __init__(self, x1, x2):
+        super().__init__(x1.shape, NM.get('product'), 'product', [x1, x2])
+        x1.output_list.append(self)
+        if x1 is not x2:
+            x2.output_list.append(self)
+    def eval(self, feed):
+        result = result = self.input_list[0].eval(
+                feed)*self.input_list[1].eval(feed)
+        feed.update({self.name: result})
+        return result
 
 def square_sum(x):
     out = reduce_mean(product(x, x))
