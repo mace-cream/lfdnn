@@ -12,7 +12,7 @@ from sklearn.utils._testing import assert_array_equal
 
 import lfdnn
 from lfdnn import tensor
-from lfdnn import sigmoid, add, reduce_mean, product, matmul, CE_with_logit, scale, softmax
+from lfdnn import operator
 
 from lfdnn.utils import TensorOpUndefinedError, TensorOpNotSupported
 from lfdnn.numerical_tensor import numerical_accuracy
@@ -23,17 +23,17 @@ from logistic_regression import Logistic
 class TestAutoDifferential(unittest.TestCase):
     def test_shape(self):
         a = tensor([1, 2], 'a')
-        self.assertEqual(reduce_mean(a).shape, [1, 1])
+        self.assertEqual(operator.reduce_mean(a).shape, [1, 1])
 
     def test_forward(self):
         a = tensor([2], 'a')
         feed = {'a': np.array([5, 6])}
-        self.assertAlmostEqual(reduce_mean(a).forward(feed), 5.5)
+        self.assertAlmostEqual(operator.reduce_mean(a).forward(feed), 5.5)
 
     def test_backward(self):
         a = tensor([1, 1], 'a')
         feed = {'a': np.array([[0]])}
-        self.assertAlmostEqual(sigmoid(a).differentiate(a, feed), 0.25)
+        self.assertAlmostEqual(operator.sigmoid(a).differentiate(a, feed), 0.25)
 
     def test_null_operator(self):
         a = tensor([1, 2], 'a')
@@ -59,19 +59,19 @@ class TestAutoDifferential(unittest.TestCase):
         feed = {'a': np.array([[1, 2, 3]])}
         answer_list = np.exp([1, 2, 3])
         answer_list /= np.sum(answer_list)
-        assert_array_almost_equal(softmax(a).forward(feed)[0], answer_list)
+        assert_array_almost_equal(operator.softmax(a).forward(feed)[0], answer_list)
 
     def test_log_softmax(self):
         a = tensor([1, 3], 'a')
         feed = {'a': np.array([[1, 2, 3]])}
-        assert_array_almost_equal(lfdnn.log_softmax(a).forward(feed), lfdnn.log(softmax(a)).forward(feed))
+        assert_array_almost_equal(operator.log_softmax(a).forward(feed), operator.log(operator.softmax(a)).forward(feed))
 
     def test_cross_entropy(self):
         x = tensor([3, 3], 'x')
         y = tensor([3, 3], 'y')
         feed = {'x': np.array([[0.4, 0.5, 0.1], [0.4, 0.5, 0.1], [0.4, 0.5, 0.1]]), 'y': np.array([[0, 0, 1], [0, 0, 1], [1, 0, 0]])}
         true_value = (2 * np.log(0.1) + np.log(0.4)) / 3
-        self.assertAlmostEqual(lfdnn.CE(x, y).eval(feed), -1.0 * true_value)
+        self.assertAlmostEqual(operator.CE(x, y).eval(feed), -1.0 * true_value)
 
     def test_matrix_multiplication(self):
         a = tensor([2, 3], 'a')
@@ -79,14 +79,14 @@ class TestAutoDifferential(unittest.TestCase):
         feed = {'a': np.array([[0.4, 0.5, 1.1], [0.1, 2.3, -0.3]]),
                 'b': np.array([[1.2], [-2.3], [0.2]])}
         true_matrix = np.array([[-0.45], [-5.23]])
-        assert_array_almost_equal(lfdnn.matmul(a, b).eval(feed), true_matrix)
+        assert_array_almost_equal(operator.matmul(a, b).eval(feed), true_matrix)
 
     def test_mse(self):
         a = tensor([3, 1], 'a')
         b = tensor([3, 1], 'b')
         feed = {'a': np.array([[1.3], [-2.2], [0.4]]),
                 'b': np.array([[1.2], [-2.3], [0.2]])}
-        self.assertAlmostEqual(lfdnn.operator.mse(a, b).eval(feed), 0.02)
+        self.assertAlmostEqual(operator.mse(a, b).eval(feed), 0.02)
 
 class TestMLP(unittest.TestCase):
     def test_construction_model(self):

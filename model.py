@@ -42,7 +42,7 @@ class MLP(lfdnn.Graph):
                 self.weight['Weight' + str(i)] = w
             b = lfdnn.tensor([1, HiddenNum[i]],'Bias' + str(i))
             self.weight['Bias' + str(i)] = b
-            h = lfdnn.add(lfdnn.matmul(h, w), b)
+            h = lfdnn.add(lfdnn.operator.matmul(h, w), b)
             h = lfdnn.sigmoid(h)
         if len(HiddenNum) > 0:
             w = lfdnn.tensor([HiddenNum[-1], OutputDim], 'output_weight')
@@ -51,10 +51,10 @@ class MLP(lfdnn.Graph):
         self.weight['output_weight'] = w
         b = lfdnn.tensor([1, OutputDim], 'output_bias')
         self.weight['output_bias'] = b
-        h = lfdnn.add(lfdnn.matmul(h, w), b)
-        self.output = lfdnn.softmax(h)
-        self.loss = lfdnn.CE_with_logit(h, self.label)
+        h = lfdnn.operator.add(lfdnn.operator.matmul(h, w), b)
+        self.output = lfdnn.operator.softmax(h)
+        self.loss = lfdnn.operator.CE_with_logit(h, self.label)
         if _lambda > 0:
             for w in self.weight.values():
-                self.loss = lfdnn.add(self.loss, lfdnn.scale(lfdnn.reduce_mean(lfdnn.product(w, w)), _lambda))
-        self.accuracy = lfdnn.accuracy(self.output, self.label)
+                self.loss = lfdnn.operator.add(self.loss, lfdnn.operator.scale(lfdnn.operator.reduce_mean(lfdnn.operator.product(w, w)), _lambda))
+        self.accuracy = lfdnn.operator.accuracy(self.output, self.label)
