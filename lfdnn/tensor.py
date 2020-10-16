@@ -65,7 +65,10 @@ class NameManager(object):
         return name + '_' + str(self.nameList[name])
 
 
-class Graph(object):
+class Graph:
+    '''base class for machine learning objective function
+       the optimizer is based on stochastic gradient descent
+    '''
     def __init__(self, learning_rate=0.05, epoch_num=1, batch_size='auto'):
         self.learning_rate = learning_rate
         self.epoch_num = epoch_num
