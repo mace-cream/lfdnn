@@ -14,7 +14,12 @@ jobs:
           python-version: 3.8
       - name: install deps
         shell: bash -l {0}
-        run: conda install numpy=1.19.1 scikit-learn=0.23.2
+        run: conda install numpy=1.19.1 scikit-learn=0.23.2 coverage
       - name: run grading
         shell: bash -l {0}
-        run: python test.py
+        run: python -m coverage run test.py
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          flags: unittests
