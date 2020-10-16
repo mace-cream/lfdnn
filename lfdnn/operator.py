@@ -28,10 +28,11 @@ class add(tensor):
         if x1 is not x2:
             x2.output_list.append(self)
     def eval(self, feed):
-        result = self.input_list[0].eval(feed) +\
+        result = self.input_list[0].eval(feed) + \
                  self.input_list[1].eval(feed)
         feed.update({self.name: result})
         return result
+
 
 class sigmoid(tensor):
     def __init__(self, x):
@@ -41,7 +42,12 @@ class sigmoid(tensor):
         result = _sigmoid(self.input_list[0].eval(feed))
         feed.update({self.name: result})
         return result
-
+    def _derivative(self, feed, input, target):
+        # input must be in self.input_list
+        jacob = _sigmoid(input.eval(feed)) * \
+                    (1 - _sigmoid(input.eval(feed)))
+        return jacob * self.back(target, feed)
+        
 class relu(tensor):
     def __init__(self, x):
         super().__init__(x.shape, NM.get('relu'), 'relu', [x])
@@ -51,6 +57,10 @@ class relu(tensor):
         result[result < 0] = 0
         feed.update({self.name: result})
         return result
+    def _derivative(self, feed, input, target):
+        local_gradient = self.eval(feed)
+        local_gradient = (local_gradient > 0) * 1.0
+        return local_gradient * self.back(target, feed)
 
 class log(tensor):
     def __init__(self, x):
@@ -75,6 +85,13 @@ class product(tensor):
                 feed)*self.input_list[1].eval(feed)
         feed.update({self.name: result})
         return result
+    def _derivative(self, feed, input, target):
+        gradient = 0
+        if input is self.input_list[0]:
+            gradient = self.back(target, feed) * self.input_list[1].eval(feed)
+        if input is self.input_list[1]:
+            gradient += self.back(target, feed) * self.input_list[0].eval(feed)
+        return gradient
 
 def square_sum(x):
     out = reduce_mean(product(x, x))

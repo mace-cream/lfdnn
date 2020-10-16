@@ -35,6 +35,21 @@ class TestAutoDifferential(unittest.TestCase):
         feed = {'a': np.array([[0]])}
         self.assertAlmostEqual(operator.sigmoid(a).differentiate(a, feed), 0.25)
 
+    def test_backward_add(self):
+        a = tensor([1, 1], 'a')
+        feed = {'a': np.array([[0.1]])}
+        target = operator.add(operator.product(a, a), operator.scale(a, 3))
+        self.assertAlmostEqual(target.eval(feed)[0, 0], 0.31)
+        self.assertAlmostEqual(operator.reduce_sum(target).differentiate(a, feed)[0, 0], 3.2)
+
+    def test_relu_derivative(self):
+        a = tensor([1, 3], 'a')
+        feed = {'a': np.array([[-1, 0, 3]])}
+        assert_array_almost_equal(operator.relu(a).differentiate(a, feed), np.array([[0, 0, 1]]))
+        result_1 = operator.relu(operator.sigmoid(a)).differentiate(a, feed)
+        result_2 = operator.sigmoid(a).differentiate(a, feed)
+        assert_array_almost_equal(result_1, result_2)
+
     def test_null_operator(self):
         a = tensor([1, 2], 'a')
         feed = {}
@@ -65,6 +80,7 @@ class TestAutoDifferential(unittest.TestCase):
         a = tensor([1, 3], 'a')
         feed = {'a': np.array([[1, 2, 3]])}
         assert_array_almost_equal(operator.log_softmax(a).forward(feed), operator.log(operator.softmax(a)).forward(feed))
+
     def test_relu(self):
         a = tensor([1, 3], 'a')
         feed = {'a': np.array([[1, -1, 3]])}

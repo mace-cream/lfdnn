@@ -36,8 +36,7 @@ class tensor(object):
         raise TensorOpNotSupported('Unsupported operator type: ' + self.op_type)
 
     def back(self, target, feed):
-        '''
-        Define the gradient back propagation with respect to 'target' given input 'feed'
+        '''Define the gradient back propagation with respect to 'target' given input 'feed'
         '''
         if self.name+'_g' in feed.keys():
             return feed[self.name+'_g']
@@ -54,15 +53,10 @@ class tensor(object):
                     gradient = gradient + \
                         np.matmul(out.input_list[0].eval(
                             feed).T, out.back(target, feed))
-            elif out.op_type == 'sigmoid':
-                jacob = _sigmoid(self.eval(feed)) * \
-                    (1-_sigmoid(self.eval(feed)))
-                gradient = gradient + jacob * out.back(target, feed)
+            elif out.op_type == 'sigmoid':                
+                gradient = gradient + out._derivative(feed, self, target)
             elif out.op_type == 'relu':
-                forward_gradient = out.back(target, feed)
-                local_gradient = out.eval(feed)
-                local_gradient = (local_gradient != 0)*1.0
-                gradient = gradient + local_gradient
+                gradient = gradient + out._derivative(feed, self, target)
             elif out.op_type == 'softmax':
                 logits = _softmax(self.eval(feed))
                 forward_gradient = out.back(target, feed)
@@ -100,6 +94,7 @@ class tensor(object):
                     gradient = gradient + \
                         np.sum(out.back(target, feed), tuple(
                             boardcast_dim)).reshape(self.shape)
+                     
             elif out.op_type == 'log':
                 gradient = gradient + 1/self.eval(feed)*out.back(target, feed)
             elif out.op_type == 'product':
@@ -136,7 +131,8 @@ class tensor(object):
 
             elif out.op_type in ['accuracy']:
                 pass
-
+            else:
+                raise TensorOpNotSupported('Unsupported operator type: ' + self.op_type)
         feed.update({self.name+'_g': gradient})
         return gradient
 
