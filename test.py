@@ -86,7 +86,7 @@ class TestAutoDifferential(unittest.TestCase):
         b = tensor([3, 1], 'b')
         feed = {'a': np.array([[1.3], [-2.2], [0.4]]),
                 'b': np.array([[1.2], [-2.3], [0.2]])}
-        self.assertAlmostEqual(lfdnn.op.mse(a, b).eval(feed), 0.02)
+        self.assertAlmostEqual(lfdnn.operator.mse(a, b).eval(feed), 0.02)
 
 class TestMLP(unittest.TestCase):
     def test_construction_model(self):

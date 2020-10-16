@@ -1,5 +1,5 @@
 from lfdnn.tensor import tensor
-from lfdnn.op import accuracy
+from lfdnn.operator import accuracy
 from lfdnn.utils import one_hot
 
 def numerical_accuracy(y_predict_prob, y_true):
