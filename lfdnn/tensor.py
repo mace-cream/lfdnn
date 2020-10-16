@@ -233,10 +233,21 @@ class Graph(object):
         feed.update(self.weight_value)
         return self.output.eval(feed)
 
+    def _epoch_iterate(self, x_batch, y_batch):
+        '''
+        return the loss and accuracy of current epoch
+        '''
+        feed = {self.input.name: x_batch, self.label.name: y_batch}
+        feed.update(self.weight_value)
+        loss_val = self.loss.eval(feed)
+        acc = self.accuracy.eval(feed)
+        self.update(feed)
+        return (loss_val, acc)
+        
     def train(self, x_train, y_train):
         self.construct_model(x_train, y_train)
         self.initWeight()
-        OutputDim = self.label.shape[-1]
+        output_dim = self.label.shape[-1]
         batch_size = self.input.shape[0]
         accuracy_train = []
         loss = []
@@ -244,10 +255,8 @@ class Graph(object):
             counter = 0
             while counter + batch_size <= x_train.shape[0]:
                 x_batch = x_train[counter: counter + batch_size].reshape([batch_size, -1])
-                y_batch = one_hot(y_train[counter: counter + batch_size], OutputDim)
-                feed = {self.input.name: x_batch, self.label.name: y_batch}
-                feed.update(self.weight_value)
-                accuracy_train.append(self.accuracy.eval(feed))
-                loss.append(self.loss.eval(feed))
-                self.update(feed)
+                y_batch = one_hot(y_train[counter: counter + batch_size], output_dim)
+                loss_val, acc = self._epoch_iterate(x_batch, y_batch)
+                accuracy_train.append(acc)
+                loss.append(loss_val)
                 counter += batch_size

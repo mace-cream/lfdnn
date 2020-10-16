@@ -1,31 +1,36 @@
 import numpy as np
 from sklearn.metrics import accuracy_score
 
+from model import MLP
+from lfdnn.utils import one_hot
+
 class Logistic:
     """
+    logistic regression using MLP implementation
+    also support softmax regression
     Parameters
     ----------
     tol: double, optional, the stopping criteria for the weights
     max_iter: int, optional, the maximal number of iteration
     """
     def __init__(self, tol=1e-4, max_iter=100):
-
         self.tol = tol
         self.max_iter = max_iter
+        self.mlp = MLP(epoch_num=max_iter, batch_size='auto', learning_rate=0.1)
 
     def get_params(self, deep=False):
         """Get parameters for this estimator"""
         return {'tol': self.tol, 'max_iter': self.max_iter}
 
     def _iteration_step(self, x_train, y_train):
-        # put your training code here
-        mu = 1 / (1 + np.exp(-x_train @ self.theta))
-        R = np.diag(mu * (1 - mu))
-        self.theta += np.linalg.lstsq(x_train.T @ R @ x_train, x_train.T @ (y_train - mu))[0]              
+        self.mlp._epoch_iterate(x_train, y_train)
+        weight_matrix = self.mlp.weight_value['output_weight']
+        self.theta = weight_matrix[:, 0] - weight_matrix[:, 1]
         pass
 
     def train(self, x_train, y_train):
         """Receive the input training data, then learn the model.
+           using the API of multilayer perception
         Parameters
         ----------
         x_train: np.array, shape (num_samples, num_features)
@@ -35,9 +40,12 @@ class Logistic:
         None
         """
         self.theta = np.zeros(x_train.shape[1])
+        y_train_inner = one_hot(y_train, 2)
+        self.mlp.construct_model(x_train, y_train)
+        self.mlp.initWeight()
         for _ in range(self.max_iter):
             last_theta = self.theta.copy()
-            self._iteration_step(x_train, y_train)
+            self._iteration_step(x_train, y_train_inner)
             if np.linalg.norm(self.theta - last_theta) < self.tol:
                 break
         return
@@ -79,8 +87,5 @@ class Logistic:
         pred: np.array, shape (num_samples, n_classes),
               the probability of the sample for each class in the model
         """
-        pred = np.zeros([x_data.shape[0], 2])
-        # put your predicting code here
-        pred[:, 1] = 1 / (1 + np.exp(- x_data @ self.theta))
-        pred[:, 0] = 1 - pred[:, 1]        
+        pred = self.mlp.predict(x_data)  
         return pred

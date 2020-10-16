@@ -44,12 +44,12 @@ class MLP(lfdnn.Graph):
             h = lfdnn.add(lfdnn.matmul(h, w), b)
             h = lfdnn.sigmoid(h)
         if len(HiddenNum) > 0:
-            w = lfdnn.tensor([HiddenNum[-1], OutputDim], 'OutputWeight')
+            w = lfdnn.tensor([HiddenNum[-1], OutputDim], 'output_weight')
         else:
-            w = lfdnn.tensor([InputDim, OutputDim], 'OutputWeight')
-        self.weight['OutputWeight'] = w
-        b = lfdnn.tensor([1, OutputDim], 'OutputBias')
-        self.weight['OutputBias'] = b
+            w = lfdnn.tensor([InputDim, OutputDim], 'output_weight')
+        self.weight['output_weight'] = w
+        b = lfdnn.tensor([1, OutputDim], 'output_bias')
+        self.weight['output_bias'] = b
         h = lfdnn.add(lfdnn.matmul(h, w), b)
         self.output = lfdnn.softmax(h)
         self.loss = lfdnn.CE_with_logit(h, self.label)
