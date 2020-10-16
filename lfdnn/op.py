@@ -4,6 +4,9 @@ import numpy as np
 NM = NameManager()
 
 def matmul(x1, x2):
+    '''
+        matrix multiplication
+    '''
     out = tensor(x1.shape[:-1] + x2.shape[1:],
                  NM.get('matmul'), 'matmul', [x1, x2])
     x1.output_list.append(out)
@@ -56,7 +59,7 @@ def log_softmax(x):
     return out
 
 def reduce_sum(x):
-    out = tensor([1,1], NM.get('reduce_sum'), 'reduce_sum', [x])
+    out = tensor([1, 1], NM.get('reduce_sum'), 'reduce_sum', [x])
     x.output_list.append(out)
     return out
 
@@ -69,6 +72,9 @@ def scale(x, alpha):
     return out
 
 def reduce_mean(x):
+    '''
+        mean value of x along axis = 0
+    '''
     out = scale(reduce_sum(x), 1 / x.shape[0])
     return out
 
@@ -81,6 +87,9 @@ def CE(x, y):
     return out
 
 def CE_with_logit(x, y):
+    '''
+    loss function for multi-class classification
+    '''
     out = scale(reduce_mean(product(y, log_softmax(x))), -1)
     return out
 

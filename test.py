@@ -73,6 +73,14 @@ class TestAutoDifferential(unittest.TestCase):
         true_value = (2 * np.log(0.1) + np.log(0.4)) / 3
         self.assertAlmostEqual(lfdnn.CE(x, y).eval(feed), -1.0 * true_value)
 
+    def test_matrix_multiplication(self):
+        a = tensor([2, 3], 'a')
+        b = tensor([3, 1], 'b')
+        feed = {'a': np.array([[0.4, 0.5, 1.1], [0.1, 2.3, -0.3]]),
+                'b': np.array([[1.2], [-2.3], [0.2]])}
+        true_matrix = np.array([[-0.45], [-5.23]])
+        assert_array_almost_equal(lfdnn.matmul(a, b).eval(feed), true_matrix)
+
 class TestMLP(unittest.TestCase):
     def test_construction_model(self):
         mlp = MLP()
