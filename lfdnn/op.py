@@ -69,14 +69,17 @@ def scale(x, alpha):
     return out
 
 def reduce_mean(x):
-    out = scale(reduce_sum(x), 1 / np.product(x.shape))
+    out = scale(reduce_sum(x), 1 / x.shape[0])
     return out
 
-def CE(x,y):
+def CE(x, y):
+    '''
+    average cross-entropy multiplied by -1
+    '''
     out = scale(reduce_mean(product(y, log(x))), -1)
     return out
 
-def CE_with_logit(x,y):
+def CE_with_logit(x, y):
     out = scale(reduce_mean(product(y, log_softmax(x))), -1)
     return out
 
