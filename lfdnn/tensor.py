@@ -33,26 +33,7 @@ class tensor(object):
             return feed[self.name]
         if self.op_type is None:
             raise TensorOpUndefinedError('tensor.op_type not defined')
-        elif self.op_type == 'softmax':
-            result = _softmax(self.input_list[0].eval(feed))
-        elif self.op_type == 'log_softmax':
-            logit = self.input_list[0].eval(feed)
-            # Note: The exact calculation of log(sum(exp(s_i))) has serious numerical issue, we use max instead.
-            result = logit - np.log(np.sum(np.exp(logit), 1, keepdims=True))
-            if np.any(~np.isfinite(result)):
-                result = logit - np.max(logit, 1, keepdims=True)
-        elif self.op_type == 'reduce_sum':
-            result = np.sum(self.input_list[0].eval(feed))
-        elif self.op_type == 'scale':
-            result = self.input_list[1]*self.input_list[0].eval(feed)
-        elif self.op_type == 'accuracy':
-            result = np.mean(np.argmax(self.input_list[0].eval(
-                feed), -1) == np.argmax(self.input_list[1].eval(feed), -1))
-        else:
-            raise TensorOpNotSupported('Unsupported operator type: ' + self.op_type)
-
-        feed.update({self.name: result})
-        return result
+        raise TensorOpNotSupported('Unsupported operator type: ' + self.op_type)
 
     def back(self, target, feed):
         '''
