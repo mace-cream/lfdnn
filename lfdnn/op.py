@@ -66,6 +66,11 @@ def reduce_sum(x):
 def scale(x, alpha):
     '''
         multiply a tensor x by a scalar alpha
+
+        Parameters
+        ==========
+        x: tensor object
+        alpha: double
     '''
     out = tensor(x.shape, NM.get('scale'), 'scale', [x, alpha])
     x.output_list.append(out)
@@ -76,6 +81,14 @@ def reduce_mean(x):
         mean value of x along axis = 0
     '''
     out = scale(reduce_sum(x), 1 / x.shape[0])
+    return out
+
+def mse(x, y):
+    '''
+       mean square error
+    '''
+    subtract_out = add(x, scale(y, -1))
+    out = reduce_mean(product(subtract_out, subtract_out))
     return out
 
 def CE(x, y):
