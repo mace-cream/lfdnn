@@ -40,9 +40,9 @@ class Logistic:
         None
         """
         self.theta = np.zeros(x_train.shape[1])
-        y_train_inner = one_hot(y_train, 2)
         self.mlp.construct_model(x_train, y_train)
         self.mlp.initWeight()
+        y_train_inner = one_hot(y_train, 2)
         for _ in range(self.max_iter):
             last_theta = self.theta.copy()
             self._iteration_step(x_train, y_train_inner)

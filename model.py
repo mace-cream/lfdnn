@@ -27,7 +27,8 @@ class MLP(lfdnn.Graph):
         BatchSize = self.batch_size
         _lambda = self._lambda
         if BatchSize == 'auto':
-            BatchSize = InputDim
+            # use all data
+            BatchSize = x_train.shape[0]
 
         self.input = lfdnn.tensor([BatchSize, InputDim], 'Input')
         self.label = lfdnn.tensor([BatchSize, OutputDim], 'Label')
