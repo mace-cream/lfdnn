@@ -142,7 +142,19 @@ class log_softmax(tensor):
             result = logit - np.max(logit, 1, keepdims=True)
         feed.update({self.name: result})
         return result
-    
+    def _derivative(self, feed, input, target):
+        logits = _softmax(input.eval(feed))
+        forward_gradient = self.back(target, feed)
+        local_gradient = []
+        for i in range(input.shape[0]):
+            local_logits = logits[i].reshape((-1, 1))
+            jacob = np.eye(
+                local_logits.shape[0]) - np.matmul(local_logits, (0 * local_logits + 1).T)
+            local_gradient.append(
+                np.matmul(jacob, forward_gradient[i].reshape((-1, 1))).T)
+        local_gradient = np.concatenate(local_gradient, 0)
+        return local_gradient
+
 class reduce_sum(tensor):
     def __init__(self, x):
         super().__init__([1, 1], NM.get('reduce_sum'), 'reduce_sum', [x])

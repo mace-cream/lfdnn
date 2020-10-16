@@ -38,7 +38,7 @@ class tensor(object):
     def back(self, target, feed):
         '''Define the gradient back propagation with respect to 'target' given input 'feed'
         '''
-        if self.name+'_g' in feed.keys():
+        if self.name + '_g' in feed.keys():
             return feed[self.name+'_g']
         if self is target:
             return np.ones(self.shape)
@@ -51,30 +51,9 @@ class tensor(object):
             elif out.op_type == 'relu':
                 gradient = gradient + out._derivative(feed, self, target)
             elif out.op_type == 'softmax':
-                logits = _softmax(self.eval(feed))
-                forward_gradient = out.back(target, feed)
-                if forward_gradient != 0:
-                    local_gradient = []
-                    for i in range(self.shape[0]):
-                        local_logits = logits[i].reshape((-1, 1))
-                        jacob = np.diag(
-                            logits[i])-np.matmul(local_logits, local_logits.T)
-                        local_gradient.append(
-                            np.matmul(forward_gradient[i].reshape((1, -1)), jacob))
-                    local_gradient = np.concatenate(local_gradient, 0)
-                    gradient = gradient + local_gradient
+                pass
             elif out.op_type == 'log_softmax':
-                logits = _softmax(self.eval(feed))
-                forward_gradient = out.back(target, feed)
-                local_gradient = []
-                for i in range(self.shape[0]):
-                    local_logits = logits[i].reshape((-1, 1))
-                    jacob = np.eye(
-                        local_logits.shape[0])-np.matmul(local_logits, (0*local_logits+1).T)
-                    local_gradient.append(
-                        np.matmul(jacob, forward_gradient[i].reshape((-1, 1))).T)
-                local_gradient = np.concatenate(local_gradient, 0)
-                gradient = gradient + local_gradient
+                gradient = gradient + out._derivative(feed, self, target) 
             elif out.op_type == 'add':
                 gradient = gradient + out._derivative(feed, self, target) 
             elif out.op_type == 'log':
