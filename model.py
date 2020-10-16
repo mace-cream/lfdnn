@@ -5,13 +5,13 @@ from lfdnn import operator
 
 class MLP(lfdnn.Graph):
     '''
-        EpochNum: int, number of epochs in traning
-        BatchSize: int, batch size used in SGD, default to all data
+        epoch_num: int, number of epochs in traning
+        batch_size: int, batch size used in SGD, default to all data
         input_dim: int, number of feature for each input data
         output_dim: int, number of classes for output label
         layer_num: int, number of intermediate layer
         hidden_layer_num: array-like, len(hidden_layer_num) = layer_num, the number of nodes at each hidden layer
-        LearningRate: double, learning rate in SGD
+        learning_rate: double, learning rate in SGD
         _lambda: double, regularization parameter
     '''
     def __init__(self, learning_rate=0.05, epoch_num=1, batch_size='auto', hidden_layer_sizes=(), _lambda=0):
@@ -26,14 +26,14 @@ class MLP(lfdnn.Graph):
         output_dim = len(np.unique(y_train))
         layer_num = len(self.hidden_layer_sizes)
         hidden_layer_num = self.hidden_layer_sizes
-        BatchSize = self.batch_size
+        batch_size = self.batch_size
         _lambda = self._lambda
-        if BatchSize == 'auto':
+        if batch_size == 'auto':
             # use all data
-            BatchSize = x_train.shape[0]
+            batch_size = x_train.shape[0]
 
-        self.input = lfdnn.tensor([BatchSize, input_dim], 'Input')
-        self.label = lfdnn.tensor([BatchSize, output_dim], 'Label')
+        self.input = lfdnn.tensor([batch_size, input_dim], 'Input')
+        self.label = lfdnn.tensor([batch_size, output_dim], 'Label')
         h = self.input
         for i in range(layer_num):
             if i == 0:

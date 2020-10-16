@@ -2,7 +2,7 @@ import numpy as np
 from sklearn.metrics import r2_score
 
 import lfdnn
-from lfdnn import Graph
+from lfdnn import Graph, operator
 
 class RidgeRegression(Graph):
     """
@@ -11,35 +11,38 @@ class RidgeRegression(Graph):
     ----------
     alpha: regularization strength
     """
-    def __init__(self, alpha=1.0 , learning_rate=0.05, epoch_num=1, batch_size='auto'):
+    def __init__(self, alpha=1.0, learning_rate=0.05, epoch_num=1, batch_size='auto'):
         self.alpha = alpha
         super().__init__(learning_rate=learning_rate, epoch_num=epoch_num, batch_size=batch_size)
         pass
 
     def construct_model(self, x_train, y_train):
         # get number of features
-        InputDim = x_train.shape[-1]
+        input_dim = x_train.shape[-1]
         # get number of classes
-        OutputDim = len(np.unique(y_train))
-        BatchSize = self.batch_size
+        output_dim = len(np.unique(y_train))
+        batch_size = self.batch_size
         _lambda = self.alpha
-        if BatchSize == 'auto':
+        if batch_size == 'auto':
             # use all data
-            BatchSize = x_train.shape[0]
+            batch_size = x_train.shape[0]
 
-        self.input = lfdnn.tensor([BatchSize, InputDim], 'Input')
-        self.label = lfdnn.tensor([BatchSize, OutputDim], 'Label')
+        self.input = lfdnn.tensor([batch_size, input_dim], 'Input')
+        self.target_value = lfdnn.tensor([batch_size, output_dim], 'target_value')
         h = self.input
-        w = lfdnn.tensor([InputDim, OutputDim], 'output_weight')
+        w = lfdnn.tensor([input_dim, output_dim], 'output_weight')
         self.weight['output_weight'] = w
-        b = lfdnn.tensor([1, OutputDim], 'output_bias')
+        b = lfdnn.tensor([1, output_dim], 'output_bias')
         self.weight['output_bias'] = b
-        self.output = lfdnn.add(lfdnn.matmul(h, w), b)
-        self.loss = lfdnn.CE_with_logit(h, self.label)
+        h = operator.add(operator.matmul(h, w), b)
+        self.output = h
+        self.loss = operator.mse(h, self.target_value)
         if _lambda > 0:
             for w in self.weight.values():
-                self.loss = lfdnn.add(self.loss, lfdnn.scale(lfdnn.reduce_mean(lfdnn.product(w, w)), _lambda))
-        self.accuracy = lfdnn.accuracy(self.output, self.label)
+                regularization_term = operator.scale(operator.square_sum(w), _lambda)
+                self.loss = operator.add(self.loss, regularization_term)
+        # dummy acc
+        self.accuracy = self.loss
 
     def fit(self, x_train, y_train):
         # alias for train
