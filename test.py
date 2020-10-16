@@ -116,6 +116,16 @@ class TestMLP(unittest.TestCase):
         x_train = np.zeros([3, 2])
         y_train = [1, 0, 1]
         mlp.train(x_train, y_train)
+    def test_regularization_term(self):
+        mlp = MLP(_lambda=0.1)
+        x_train = np.zeros([3, 2])
+        y_train = [1, 0, 1]
+        mlp.train(x_train, y_train)
+    def test_multiple_layer(self):
+        mlp = MLP(hidden_layer_sizes=(8, 3))
+        x_train = np.zeros([50, 10])
+        y_train = np.ones([50])
+        mlp.train(x_train, y_train)
     def test_iris(self):
         # test softmax on Iris dataset
         iris = load_iris()
