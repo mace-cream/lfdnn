@@ -13,10 +13,10 @@ class Logistic:
     tol: double, optional, the stopping criteria for the weights
     max_iter: int, optional, the maximal number of iteration
     """
-    def __init__(self, tol=1e-4, max_iter=100):
+    def __init__(self, tol=1e-4, max_iter=400):
         self.tol = tol
         self.max_iter = max_iter
-        self.mlp = MLP(epoch_num=max_iter, batch_size='auto', learning_rate=0.1)
+        self.mlp = MLP(batch_size='auto', learning_rate=0.1)
 
     def get_params(self, deep=False):
         """Get parameters for this estimator"""

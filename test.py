@@ -119,7 +119,7 @@ class TestLogisticModel(unittest.TestCase):
         X, y = make_classification(n_samples=100, n_features=n_features, random_state=0)
         lr1 = LogisticRegression(random_state=0, fit_intercept=False, C=1500)
         lr1.fit(X, y)
-        clf = Logistic(max_iter=100)
+        clf = Logistic(max_iter=400)
         clf.fit(X, y)
         lr1_loss = _logistic_loss(lr1.coef_.reshape(n_features), X, 2 * y - 1, 0)
         clf_loss = clf.log_loss(X, y)
