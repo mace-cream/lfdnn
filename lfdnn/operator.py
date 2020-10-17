@@ -103,8 +103,8 @@ class product(tensor):
         if x1 is not x2:
             x2.output_list.append(self)
     def eval(self, feed):
-        result = result = self.input_list[0].eval(
-                feed)*self.input_list[1].eval(feed)
+        result = self.input_list[0].eval(
+                feed) * self.input_list[1].eval(feed)
         feed.update({self.name: result})
         return result
     def _derivative(self, feed, input, target):

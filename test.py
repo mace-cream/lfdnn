@@ -37,6 +37,11 @@ class TestAutoDifferential(unittest.TestCase):
         feed = {'a': np.array([5, 6])}
         self.assertAlmostEqual(operator.reduce_mean(a).forward(feed), 5.5)
 
+    def test_product(self):
+        a = tensor([2, 1], 'a')
+        feed = {'a': np.array([[5], [6]])}
+        print(operator.product(a, a).eval(feed))
+
     def test_backward(self):
         a = tensor([1, 1], 'a')
         feed = {'a': np.array([[0]])}
