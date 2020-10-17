@@ -115,7 +115,7 @@ class product(tensor):
             gradient += self.back(target, feed) * self.input_list[0].eval(feed)
         return gradient
 
-def square_sum(x):
+def mean_square_sum(x):
     out = reduce_mean(product(x, x))
     return out
 
@@ -187,14 +187,14 @@ class scale(tensor):
 def reduce_mean(x):
     '''mean value of x along axis = 0
     '''
-    out = scale(reduce_sum(x), 1 / x.shape[0])
+    out = scale(reduce_sum(x), 1.0 / x.shape[0])
     return out
 
 def mse(x, y):
     '''mean square error
     '''
     subtract_out = add(x, scale(y, -1))
-    out = square_sum(subtract_out)
+    out = mean_square_sum(subtract_out)
     return out
 
 def CE(x, y):

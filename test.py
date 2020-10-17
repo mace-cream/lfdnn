@@ -113,7 +113,8 @@ class TestAutoDifferential(unittest.TestCase):
         b = tensor([3, 1], 'b')
         feed = {'a': np.array([[1.3], [-2.2], [0.4]]),
                 'b': np.array([[1.2], [-2.3], [0.2]])}
-        self.assertAlmostEqual(operator.mse(a, b).eval(feed), 0.02)
+        true_value = mean_squared_error(feed['a'], feed['b'])
+        self.assertAlmostEqual(operator.mse(a, b).eval(feed), true_value)
 
 class TestMLP(unittest.TestCase):
     def test_construction_model(self):
@@ -158,12 +159,13 @@ class TestRidgeModel(unittest.TestCase):
         y = rng.randn(n_samples)
         X = rng.randn(n_samples, n_features)
 
-        ridge = Ridge(alpha=alpha, fit_intercept=False)
+        ridge = Ridge(alpha=alpha, fit_intercept=True, solver='sag')
         custom_implemented_ridge = RidgeRegression(alpha=alpha)
         ridge.fit(X, y)
-        print(mean_squared_error(ridge.predict(X), y))
+        print(mean_squared_error(ridge.predict(X), y) + alpha * np.linalg.norm(ridge.coef_) ** 2)
         custom_implemented_ridge.fit(X, y)
         print(custom_implemented_ridge._epoch_iterate(X, y))
+        print(mean_squared_error(custom_implemented_ridge.predict(X), y) + alpha * np.linalg.norm(custom_implemented_ridge.theta) ** 2)
         self.assertEqual(custom_implemented_ridge.theta.shape, (X.shape[1], 1))
         self.assertAlmostEqual(ridge.score(X, y), custom_implemented_ridge.score(X, y))
 

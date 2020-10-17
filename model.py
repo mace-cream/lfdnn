@@ -58,6 +58,6 @@ class MLP(lfdnn.Graph):
         self.loss = operator.CE_with_logit(h, self.label)
         if _lambda > 0:
             for w in self.weight.values():
-                regularization_term = operator.scale(operator.square_sum(w), _lambda)
+                regularization_term = operator.scale(operator.mean_square_sum(w), _lambda)
                 self.loss = operator.add(self.loss, regularization_term)
         self.accuracy = operator.accuracy(self.output, self.label)
