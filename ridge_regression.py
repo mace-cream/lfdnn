@@ -38,7 +38,7 @@ class RidgeRegression(Graph):
         self.output = h
         self.loss = operator.mse(h, self.label)
         if _lambda > 0:
-            regularization_term = operator.scale(operator.mean_square_sum(w), input_dim * _lambda)
+            regularization_term = operator.scale(operator.mean_square_sum(w), _lambda)
             self.loss = operator.add(self.loss, regularization_term)
         # dummy acc
         self.accuracy = self.loss
