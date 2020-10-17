@@ -155,6 +155,7 @@ class TestMLP(unittest.TestCase):
         self.assertTrue(numerical_accuracy(y_predict, y_train) > 0.95)
         # save the results for plotting
 
+@unittest.skipIf(RidgeRegression().skip, 'skip bonus question')
 class TestRidgeModel(unittest.TestCase):
     def test_ridge(self):
         # Ridge regression convergence test
