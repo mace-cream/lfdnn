@@ -154,7 +154,14 @@ class TestMLP(unittest.TestCase):
         mlp.train(x_train, y_train)
         y_predict = mlp.predict(x_train)
         self.assertTrue(numerical_accuracy(y_predict, y_train) > 0.95)
-        # save the results for plotting
+
+    def test_xor(self):
+        X = np.array([0, 0, 1, 1, 0, 1, 1, 0], dtype=np.float32).reshape(4,2)
+        Y = np.array([0, 0, 1, 1], dtype = np.float32)
+        mlp = MLP(hidden_layer_sizes=(2,), epoch_num=1600, learning_rate=0.22)
+        np.random.seed(2020)
+        mlp.train(X, Y)
+        self.assertAlmostEqual(numerical_accuracy(mlp.predict(X), Y), 1.0)
 
 @unittest.skipIf(RidgeRegression().skip, 'skip bonus question')
 class TestRidgeModel(unittest.TestCase):
