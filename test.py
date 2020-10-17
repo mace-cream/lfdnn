@@ -40,7 +40,7 @@ class TestAutoDifferential(unittest.TestCase):
     def test_product(self):
         a = tensor([2, 1], 'a')
         feed = {'a': np.array([[5], [6]])}
-        print(operator.product(a, a).eval(feed))
+        assert_array_almost_equal(operator.product(a, a).eval(feed), np.array([[25], [36]]))
 
     def test_backward(self):
         a = tensor([1, 1], 'a')
@@ -169,7 +169,6 @@ class TestRidgeModel(unittest.TestCase):
         ridge.fit(X, y)
         print(mean_squared_error(ridge.predict(X), y) + alpha * np.linalg.norm(ridge.coef_) ** 2)
         custom_implemented_ridge.fit(X, y)
-        print(custom_implemented_ridge._epoch_iterate(X, y))
         print(mean_squared_error(custom_implemented_ridge.predict(X), y) + alpha * np.linalg.norm(custom_implemented_ridge.theta) ** 2)
         self.assertEqual(custom_implemented_ridge.theta.shape, (X.shape[1], 1))
         self.assertAlmostEqual(ridge.score(X, y), custom_implemented_ridge.score(X, y))
