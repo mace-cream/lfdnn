@@ -35,21 +35,12 @@ class MLP(lfdnn.Graph):
         self.input = lfdnn.tensor([batch_size, input_dim], 'input')
         self.label = lfdnn.tensor([batch_size, output_dim], 'label')
         h = self.input
-        for i in range(layer_num):
-            if i == 0:
-                w = lfdnn.tensor([input_dim, hidden_layer_num[i]], 'weight' + str(i))
-                self.weight['weight' + str(i)] = w
-            else:
-                w = lfdnn.tensor([hidden_layer_num[i - 1], hidden_layer_num[i]], 'weight' + str(i))
-                self.weight['weight' + str(i)] = w
-            b = lfdnn.tensor([1, hidden_layer_num[i]],'bias' + str(i))
-            self.weight['bias' + str(i)] = b
-            h = operator.add(operator.matmul(h, w), b)
-            h = operator.sigmoid(h)
-        if len(hidden_layer_num) > 0:
-            w = lfdnn.tensor([hidden_layer_num[-1], output_dim], 'output_weight')
-        else:
-            w = lfdnn.tensor([input_dim, output_dim], 'output_weight')
+        # put your construction code here, feel free to modify the assignment of `w`
+        # Hint: you should put all weight and bias variables into self.weight
+        w = lfdnn.tensor([input_dim, output_dim], 'output_weight')
+        # end of your construction code
+
+            
         self.weight['output_weight'] = w
         b = lfdnn.tensor([1, output_dim], 'output_bias')
         self.weight['output_bias'] = b
