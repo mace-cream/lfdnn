@@ -7,25 +7,23 @@ from sklearn.datasets import load_iris, make_classification
 from sklearn.multiclass import OneVsRestClassifier
 # scikit-learn >= 0.23 has this private API `_logistic_loss`
 from sklearn.linear_model._logistic import _logistic_loss
-from sklearn.metrics import mean_squared_error
 from sklearn.linear_model import Ridge
 from sklearn.linear_model import LinearRegression
-
-from ridge_regression import RidgeRegression
 from sklearn.linear_model import LogisticRegression
-
+from sklearn.metrics import mean_squared_error
 from sklearn.utils._testing import assert_array_almost_equal
 from sklearn.utils._testing import assert_array_equal
+from sklearn.datasets import load_digits
 
 import lfdnn
 from lfdnn import tensor
 from lfdnn import operator
-
 from lfdnn.utils import TensorOpUndefinedError, TensorOpNotSupported
 from lfdnn.numerical_tensor import numerical_accuracy
 
 from model import MLP
 from logistic_regression import Logistic
+from ridge_regression import RidgeRegression
 
 class TestAutoDifferential(unittest.TestCase):
     def test_shape(self):
@@ -129,16 +127,21 @@ class TestMLP(unittest.TestCase):
         x_train = np.zeros([3, 2])
         y_train = [1, 0, 1]
         mlp.train(x_train, y_train)
-    def test_regularization_term(self):
-        mlp = MLP(_lambda=0.1)
-        x_train = np.zeros([3, 2])
-        y_train = [1, 0, 1]
+
+    def test_multiple_layer_with_regulation(self):
+        # test on UCI ML hand-written digits datasets
+        mlp = MLP(hidden_layer_sizes=(32, 16), epoch_num=40, batch_size=32, learning_rate=0.15, _lambda=0.1)
+        digits = load_digits()
+        n_samples = len(digits.images)
+        x_train = digits.data[:n_samples // 2]
+        y_train = digits.target[:n_samples // 2]
+        np.random.seed(2020)
         mlp.train(x_train, y_train)
-    def test_multiple_layer(self):
-        mlp = MLP(hidden_layer_sizes=(8, 3))
-        x_train = np.zeros([50, 10])
-        y_train = np.ones([50])
-        mlp.train(x_train, y_train)
+        self.assertTrue(numerical_accuracy(mlp.predict(x_train), y_train) > 0.90)
+        x_test = digits.data[n_samples // 2:]
+        y_test = digits.target[n_samples // 2:]
+        self.assertTrue(numerical_accuracy(mlp.predict(x_test), y_test) > 0.80)
+
     def test_iris(self):
         # test softmax on Iris dataset
         iris = load_iris()

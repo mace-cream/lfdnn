@@ -124,19 +124,17 @@ class Graph:
         self.update(feed)
         return (loss_val, acc)
         
-    def train(self, x_train, y_train):
+    def train(self, x_train, y_train, verbose=False):
         self.construct_model(x_train, y_train)
         self.initWeight()
         output_dim = self.label.shape[-1]
         batch_size = self.input.shape[0]
-        accuracy_train = []
-        loss = []
         for _ in range(self.epoch_num):
             counter = 0
             while counter + batch_size <= x_train.shape[0]:
                 x_batch = x_train[counter: counter + batch_size].reshape([batch_size, -1])
                 y_batch = one_hot(y_train[counter: counter + batch_size], output_dim)
                 loss_val, acc = self._epoch_iterate(x_batch, y_batch)
-                accuracy_train.append(acc)
-                loss.append(loss_val)
+                if verbose:
+                    print(loss_val, acc)
                 counter += batch_size

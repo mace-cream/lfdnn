@@ -32,18 +32,18 @@ class MLP(lfdnn.Graph):
             # use all data
             batch_size = x_train.shape[0]
 
-        self.input = lfdnn.tensor([batch_size, input_dim], 'Input')
-        self.label = lfdnn.tensor([batch_size, output_dim], 'Label')
+        self.input = lfdnn.tensor([batch_size, input_dim], 'input')
+        self.label = lfdnn.tensor([batch_size, output_dim], 'label')
         h = self.input
         for i in range(layer_num):
             if i == 0:
-                w = lfdnn.tensor([input_dim, hidden_layer_num[i]], 'Weight' + str(i))
-                self.weight['Weight' + str(i)] = w
+                w = lfdnn.tensor([input_dim, hidden_layer_num[i]], 'weight' + str(i))
+                self.weight['weight' + str(i)] = w
             else:
-                w = lfdnn.tensor([hidden_layer_num[i - 1], hidden_layer_num[i]], 'Weight' + str(i))
-                self.weight['Weight' + str(i)] = w
-            b = lfdnn.tensor([1, hidden_layer_num[i]],'Bias' + str(i))
-            self.weight['Bias' + str(i)] = b
+                w = lfdnn.tensor([hidden_layer_num[i - 1], hidden_layer_num[i]], 'weight' + str(i))
+                self.weight['weight' + str(i)] = w
+            b = lfdnn.tensor([1, hidden_layer_num[i]],'bias' + str(i))
+            self.weight['bias' + str(i)] = b
             h = operator.add(operator.matmul(h, w), b)
             h = operator.sigmoid(h)
         if len(hidden_layer_num) > 0:
@@ -57,7 +57,9 @@ class MLP(lfdnn.Graph):
         self.output = operator.softmax(h)
         self.loss = operator.CE_with_logit(h, self.label)
         if _lambda > 0:
-            for w in self.weight.values():
-                regularization_term = operator.scale(operator.mean_square_sum(w), _lambda)
+            for k, v in self.weight.items():
+                if k.find('bias') > 0:
+                    continue
+                regularization_term = operator.scale(operator.mean_square_sum(v), _lambda)
                 self.loss = operator.add(self.loss, regularization_term)
         self.accuracy = operator.accuracy(self.output, self.label)

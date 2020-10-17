@@ -27,7 +27,7 @@ class RidgeRegression(Graph):
             # use all data
             batch_size = x_train.shape[0]
 
-        self.input = lfdnn.tensor([batch_size, input_dim], 'Input')
+        self.input = lfdnn.tensor([batch_size, input_dim], 'input')
         self.label = lfdnn.tensor([batch_size, output_dim], 'label')
         h = self.input
         w = lfdnn.tensor([input_dim, output_dim], 'output_weight')
