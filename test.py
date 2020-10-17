@@ -196,7 +196,7 @@ class TestRidgeModel(unittest.TestCase):
 
         ridge = RidgeRegression(alpha=0, epoch_num=600, learning_rate=0.1)
         ols = LinearRegression(fit_intercept=True)
-
+        np.random.seed(2020)
         ridge.fit(X, y)
         ols.fit(X, y)
         self.assertTrue(np.linalg.norm(ridge.theta.reshape([4]) - ols.coef_) < 0.01)
