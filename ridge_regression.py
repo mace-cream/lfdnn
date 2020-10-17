@@ -19,8 +19,26 @@ class RidgeRegression(Graph):
         pass
 
     def construct_model(self, x_train, y_train):
-        # put your code here
+        # get number of features
+        input_dim = x_train.shape[-1]
+        # get number of classes
+        output_dim = 1
+        batch_size = self.batch_size
+        _lambda = self.alpha
+        if batch_size == 'auto':
+            # use all data
+            batch_size = x_train.shape[0]
 
+        self.input = lfdnn.tensor([batch_size, input_dim], 'input')
+        self.label = lfdnn.tensor([batch_size, output_dim], 'label')
+        w = lfdnn.tensor([input_dim, output_dim], 'output_weight')
+        self.weight['output_weight'] = w
+        b = lfdnn.tensor([1, output_dim], 'output_bias')
+        self.weight['output_bias'] = b        
+        # put your code here, you can adjust the following lines
+        self.output = operator.matmul(self.input, w)
+        self.loss = operator.reduce_mean(self.output)
+        # end of your modification
         # dummy acc
         self.accuracy = self.loss
 
