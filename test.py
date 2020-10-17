@@ -43,7 +43,7 @@ class TestAutoDifferential(unittest.TestCase):
     def test_backward(self):
         a = tensor([1, 1], 'a')
         feed = {'a': np.array([[0]])}
-        self.assertAlmostEqual(operator.sigmoid(a).differentiate(a, feed), 0.25)
+        self.assertAlmostEqual(operator.sigmoid(a).differentiate(a, feed)[0, 0], 0.25)
 
     def test_backward_add(self):
         a = tensor([1, 1], 'a')

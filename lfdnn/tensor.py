@@ -92,17 +92,6 @@ class Graph:
         self.weight_value = {k: initializer(
             v.shape) for k, v in self.weight.items()}
 
-    def saveModel(self, path):
-        filepath, _ = os.path.split(path)
-        if not os.path.exists(filepath):
-            os.makedirs(filepath)
-        np.savez(path, **(self.weight_value))
-
-    def loadModel(self, path):
-        if path[-4:] != '.npz':
-            path = path + '.npz'
-        self.weight_value = dict(np.load(path))
-
     def update(self, feed):
         gradient = {k: v.back(self.loss, feed) for k, v in self.weight.items()}
         self.weight_value.update({
