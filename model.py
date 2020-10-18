@@ -7,10 +7,7 @@ class MLP(lfdnn.Graph):
     '''
         epoch_num: int, number of epochs in traning
         batch_size: int, batch size used in SGD, default to all data
-        input_dim: int, number of feature for each input data
-        output_dim: int, number of classes for output label
-        layer_num: int, number of intermediate layer
-        hidden_layer_num: array-like, len(hidden_layer_num) = layer_num, the number of nodes at each hidden layer
+        hidden_layer_sizes: array-like,　the number of nodes at each hidden layer
         learning_rate: double, learning rate in SGD
         _lambda: double, regularization parameter
     '''
