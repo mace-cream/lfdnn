@@ -23,9 +23,7 @@ class Logistic:
         return {'tol': self.tol, 'max_iter': self.max_iter}
 
     def _iteration_step(self, x_train, y_train):
-        self.mlp._epoch_iterate(x_train, y_train)
-        weight_matrix = self.mlp.weight_value['output_weight']
-        self.theta = weight_matrix[:, 1] - weight_matrix[:, 0]
+        # put your training code here
         pass
 
     def train(self, x_train, y_train):

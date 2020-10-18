@@ -43,7 +43,7 @@ class TestAutoDifferential(unittest.TestCase):
     def test_backward(self):
         a = tensor([1, 1], 'a')
         feed = {'a': np.array([[0]])}
-        self.assertAlmostEqual(operator.sigmoid(a).differentiate(a, feed), 0.25)
+        self.assertAlmostEqual(operator.sigmoid(a).differentiate(a, feed)[0, 0], 0.25)
 
     def test_backward_add(self):
         a = tensor([1, 1], 'a')
@@ -121,26 +121,27 @@ class TestAutoDifferential(unittest.TestCase):
 
 class TestMLP(unittest.TestCase):
     def test_construction_model(self):
-        mlp = MLP()
+        mlp = MLP(hidden_layer_sizes=(2,))
         # number of data = 3
         # number of feature = 2
         x_train = np.zeros([3, 2])
         y_train = [1, 0, 1]
         mlp.train(x_train, y_train)
+        self.assertTrue(mlp.input.output_list[0].output_list[0].output_list[0].name.find('softmax') < 0)
 
     def test_multiple_layer_with_regulation(self):
         # test on UCI ML hand-written digits datasets
-        mlp = MLP(hidden_layer_sizes=(32, 16), epoch_num=40, batch_size=32, learning_rate=0.15, _lambda=0.1)
+        mlp = MLP(hidden_layer_sizes=(32, 16), epoch_num=60, batch_size=32, learning_rate=0.2, _lambda=0.1)
         digits = load_digits()
         n_samples = len(digits.images)
         x_train = digits.data[:n_samples // 2]
         y_train = digits.target[:n_samples // 2]
         np.random.seed(2020)
         mlp.train(x_train, y_train)
-        self.assertTrue(numerical_accuracy(mlp.predict(x_train), y_train) > 0.90)
+        self.assertTrue(numerical_accuracy(mlp.predict(x_train), y_train) > 0.98)
         x_test = digits.data[n_samples // 2:]
         y_test = digits.target[n_samples // 2:]
-        self.assertTrue(numerical_accuracy(mlp.predict(x_test), y_test) > 0.80)
+        self.assertTrue(numerical_accuracy(mlp.predict(x_test), y_test) > 0.86)
 
     def test_iris(self):
         # test softmax on Iris dataset
@@ -153,8 +154,16 @@ class TestMLP(unittest.TestCase):
         mlp.train(x_train, y_train)
         y_predict = mlp.predict(x_train)
         self.assertTrue(numerical_accuracy(y_predict, y_train) > 0.95)
-        # save the results for plotting
 
+    def test_xor(self):
+        X = np.array([0, 0, 1, 1, 0, 1, 1, 0], dtype=np.float32).reshape(4,2)
+        Y = np.array([0, 0, 1, 1], dtype = np.float32)
+        mlp = MLP(hidden_layer_sizes=(2,), epoch_num=1600, learning_rate=0.22)
+        np.random.seed(2020)
+        mlp.train(X, Y)
+        self.assertAlmostEqual(numerical_accuracy(mlp.predict(X), Y), 1.0)
+
+@unittest.skipIf(RidgeRegression().skip, 'skip bonus question')
 class TestRidgeModel(unittest.TestCase):
     def test_ridge(self):
         # Ridge regression convergence test

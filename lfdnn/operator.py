@@ -63,9 +63,9 @@ class sigmoid(tensor):
         feed.update({self.name: result})
         return result
     def _derivative(self, feed, input, target):
-        # input must be in self.input_list
-        jacob = _sigmoid(input.eval(feed)) * \
-                    (1 - _sigmoid(input.eval(feed)))
+        # write down the derivative of sigmoid here
+        jacob = 1
+        # end of your writing
         return jacob * self.back(target, feed)
         
 class relu(tensor):
@@ -78,6 +78,7 @@ class relu(tensor):
         feed.update({self.name: result})
         return result
     def _derivative(self, feed, input, target):
+        # input must be in self.input_list
         local_gradient = self.eval(feed)
         local_gradient = (local_gradient > 0) * 1.0
         return local_gradient * self.back(target, feed)
@@ -103,8 +104,10 @@ class product(tensor):
         if x1 is not x2:
             x2.output_list.append(self)
     def eval(self, feed):
-        result = self.input_list[0].eval(
-                feed) * self.input_list[1].eval(feed)
+        # write down the evaluation of product here
+        # you should modify the following line
+        result = self.input_list[0].eval(feed)
+        # end of your writing
         feed.update({self.name: result})
         return result
     def _derivative(self, feed, input, target):
@@ -192,9 +195,18 @@ def reduce_mean(x):
 
 def mse(x, y):
     '''mean square error
+       Parameters
+       ----------
+       x: tensor
+       y: tensor
+
+       Returns
+       -------
+       tensor object, which is the mean squared error of x
     '''
-    subtract_out = add(x, scale(y, -1))
-    out = mean_square_sum(subtract_out)
+    # put your composition model here
+    out = reduce_mean(x)
+    # end of your writing
     return out
 
 def CE(x, y):
@@ -206,6 +218,7 @@ def CE(x, y):
 
 def CE_with_logit(x, y):
     '''loss function for multi-class classification
+       logit means the output part before the softmax
     '''
     out = scale(reduce_mean(product(y, log_softmax(x))), -1)
     return out

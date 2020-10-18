@@ -9,9 +9,11 @@ class RidgeRegression(Graph):
     ridge regression using Automatic differentiation
     Parameters
     ----------
-    alpha: regularization strength
+    alpha: regularization parameter
     """
     def __init__(self, alpha=1.0, learning_rate=0.05, epoch_num=100, batch_size='auto'):
+        # modify self.skip = False to run the extra test for bonus question
+        self.skip = True
         self.alpha = alpha
         super().__init__(learning_rate=learning_rate, epoch_num=epoch_num, batch_size=batch_size)
         pass
@@ -29,17 +31,14 @@ class RidgeRegression(Graph):
 
         self.input = lfdnn.tensor([batch_size, input_dim], 'input')
         self.label = lfdnn.tensor([batch_size, output_dim], 'label')
-        h = self.input
         w = lfdnn.tensor([input_dim, output_dim], 'output_weight')
         self.weight['output_weight'] = w
         b = lfdnn.tensor([1, output_dim], 'output_bias')
-        self.weight['output_bias'] = b
-        h = operator.add(operator.matmul(h, w), b)
-        self.output = h
-        self.loss = operator.mse(h, self.label)
-        if _lambda > 0:
-            regularization_term = operator.scale(operator.mean_square_sum(w), _lambda)
-            self.loss = operator.add(self.loss, regularization_term)
+        self.weight['output_bias'] = b        
+        # put your code here, you can adjust the following lines
+        self.output = operator.matmul(self.input, w)
+        self.loss = operator.reduce_mean(self.output)
+        # end of your modification
         # dummy acc
         self.accuracy = self.loss
 
