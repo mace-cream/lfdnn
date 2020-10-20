@@ -83,8 +83,7 @@ class Graph:
         self.accuracy = None
 
     def construct_model(self, x_train, y_train):
-        '''
-        this function should be overridden to provide actual construction code
+        '''this function should be overridden to provide actual construction code
         '''
         raise NotImplementedError("base class function `construct_model` not callable")
 
@@ -103,8 +102,7 @@ class Graph:
         return self.output.eval(feed)
 
     def _epoch_iterate(self, x_batch, y_batch):
-        '''
-        return the loss and accuracy of current epoch
+        '''return the loss and accuracy of current epoch
         '''
         feed = {self.input.name: x_batch, self.label.name: y_batch}
         feed.update(self.weight_value)
