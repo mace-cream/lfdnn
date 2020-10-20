@@ -132,17 +132,14 @@ class softmax(tensor):
         return result
 
 class log_softmax(tensor):
-    # we found that np.log(softmax(x)) have serious numerical issue.
-    # therefore we define log_softmax() specifically.
+    '''log(softmax(x))
+    '''
     def __init__(self, x):
         super().__init__(x.shape, NM.get('log_softmax'), 'log_softmax', [x])
         x.output_list.append(self)
     def eval(self, feed):
         logit = self.input_list[0].eval(feed)
-        # Note: The exact calculation of log(sum(exp(s_i))) has serious numerical issue, we use max instead.
         result = logit - np.log(np.sum(np.exp(logit), 1, keepdims=True))
-        if np.any(~np.isfinite(result)):
-            result = logit - np.max(logit, 1, keepdims=True)
         feed.update({self.name: result})
         return result
     def _derivative(self, feed, input, target):
