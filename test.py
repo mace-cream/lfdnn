@@ -259,4 +259,21 @@ class TestLogisticModel(unittest.TestCase):
         pass
         
 if __name__=="__main__":
-    unittest.main()
+    test_obj = unittest.main(exit=False)
+    q1 = 5
+    q2 = 5
+    q3 = 0
+    if len(test_obj.result.skipped) == 0:
+        q3 = 2.5
+    for failure in test_obj.result.failures:
+        if str(failure[0]).find('AutoDifferential') > 0 and q1 > 0:
+            q1 -= 1
+        elif str(failure[0]).find('MLP') > 0 and q2 > 0:
+            q2 -= 1
+        elif str(failure[0]).find('LogisticModel') > 0 and q2 > 0:
+            q2 -= 1
+        elif str(failure[0]).find('RidgeModel') > 0 and q3 > 0:
+            q3 -= 1
+            if q3 < 0:
+                q3 = 0
+    print("Your final score of PA2: ", q1 + q2 + q3)
