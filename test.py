@@ -279,3 +279,5 @@ if __name__=="__main__":
             if q3 < 0:
                 q3 = 0
     print("Your final score of PA2: ", q1 + q2 + q3)
+    if len(f_or_e) > 0:
+        exit(-1)
