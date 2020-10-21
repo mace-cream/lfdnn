@@ -145,7 +145,7 @@ class TestMLP(unittest.TestCase):
 
     def test_xor(self):
         X = np.array([0, 0, 1, 1, 0, 1, 1, 0], dtype=np.float32).reshape(4,2)
-        Y = np.array([0, 0, 1, 1], dtype = np.float32)
+        Y = np.array([0, 0, 1, 1], dtype=np.float32)
         mlp = MLP(hidden_layer_sizes=(2,), epoch_num=1600, learning_rate=0.22)
         np.random.seed(2020)
         mlp.train(X, Y)
