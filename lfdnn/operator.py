@@ -11,7 +11,7 @@ class matmul(tensor):
     '''
     def __init__(self, x1, x2):
         super().__init__(x1.shape[:-1] + x2.shape[1:],
-                    NM.get('matmul'), 'matmul', [x1, x2])
+                    NM.get('matmul'), [x1, x2])
         x1.output_list.append(self)
         if x1 is not x2:
             x2.output_list.append(self)
@@ -32,7 +32,7 @@ class matmul(tensor):
 
 class add(tensor):
     def __init__(self, x1, x2):
-        super().__init__(x1.shape, NM.get('add'), 'add', [x1, x2])
+        super().__init__(x1.shape, NM.get('add'), [x1, x2])
         x1.output_list.append(self)
         if x1 is not x2:
             x2.output_list.append(self)
@@ -56,7 +56,7 @@ class add(tensor):
 
 class sigmoid(tensor):
     def __init__(self, x):
-        super().__init__(x.shape,NM.get('sigmoid'), 'sigmoid', [x])
+        super().__init__(x.shape,NM.get('sigmoid'), [x])
         x.output_list.append(self)
     def eval(self, feed):
         result = _sigmoid(self.input_list[0].eval(feed))
@@ -70,7 +70,7 @@ class sigmoid(tensor):
         
 class relu(tensor):
     def __init__(self, x):
-        super().__init__(x.shape, NM.get('relu'), 'relu', [x])
+        super().__init__(x.shape, NM.get('relu'), [x])
         x.output_list.append(self)
     def eval(self, feed):
         result = self.input_list[0].eval(feed)
@@ -85,7 +85,7 @@ class relu(tensor):
 
 class log(tensor):
     def __init__(self, x):
-        super().__init__(x.shape, NM.get('log'), 'log', [x])
+        super().__init__(x.shape, NM.get('log'), [x])
         x.output_list.append(self)
     def eval(self, feed):
         result = np.log(self.input_list[0].eval(feed))
@@ -99,7 +99,7 @@ class product(tensor):
     elementwise multiplication of two tensors
     '''
     def __init__(self, x1, x2):
-        super().__init__(x1.shape, NM.get('product'), 'product', [x1, x2])
+        super().__init__(x1.shape, NM.get('product'), [x1, x2])
         x1.output_list.append(self)
         if x1 is not x2:
             x2.output_list.append(self)
@@ -124,7 +124,7 @@ def mean_square_sum(x):
 
 class softmax(tensor):
     def __init__(self, x):
-        super().__init__(x.shape, NM.get('softmax'), 'softmax', [x])
+        super().__init__(x.shape, NM.get('softmax'), [x])
         x.output_list.append(self)
     def eval(self, feed):
         result = _softmax(self.input_list[0].eval(feed))
@@ -135,7 +135,7 @@ class log_softmax(tensor):
     '''log(softmax(x))
     '''
     def __init__(self, x):
-        super().__init__(x.shape, NM.get('log_softmax'), 'log_softmax', [x])
+        super().__init__(x.shape, NM.get('log_softmax'), [x])
         x.output_list.append(self)
     def eval(self, feed):
         logit = self.input_list[0].eval(feed)
@@ -157,7 +157,7 @@ class log_softmax(tensor):
 
 class reduce_sum(tensor):
     def __init__(self, x):
-        super().__init__([1, 1], NM.get('reduce_sum'), 'reduce_sum', [x])
+        super().__init__([1, 1], NM.get('reduce_sum'), [x])
         x.output_list.append(self)
     def eval(self, feed):
         result = np.sum(self.input_list[0].eval(feed))
@@ -175,7 +175,7 @@ class scale(tensor):
     alpha: double
     '''
     def __init__(self, x, alpha):
-        super().__init__(x.shape, NM.get('scale'), 'scale', [x, alpha])
+        super().__init__(x.shape, NM.get('scale'), [x, alpha])
         x.output_list.append(self)
     def eval(self, feed):
         result = self.input_list[1] * self.input_list[0].eval(feed)
@@ -224,7 +224,7 @@ class accuracy(tensor):
     '''the fraction of right prediction
     '''
     def __init__(self, pred, y):
-        super().__init__([1,1], NM.get('accuracy'), 'accuracy', [pred, y])
+        super().__init__([1,1], NM.get('accuracy'), [pred, y])
         pred.output_list.append(self)
         y.output_list.append(self)
     def eval(self, feed):

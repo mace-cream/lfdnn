@@ -3,10 +3,6 @@ import struct
 import numpy as np
 
 
-class TensorOpUndefinedError(Exception):
-    pass
-class TensorOpNotSupported(Exception):
-    pass
 
 
 def one_hot(x, depth):

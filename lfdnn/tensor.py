@@ -3,13 +3,11 @@ import os
 
 from lfdnn.utils import _sigmoid, _softmax
 from lfdnn.utils import one_hot
-from lfdnn.utils import TensorOpUndefinedError, TensorOpNotSupported
 
 class tensor(object):
-    def __init__(self, shape, name, op_type=None, input_list=None, value=None):
+    def __init__(self, shape, name, input_list=None, value=None):
         self.shape = shape
         self.name = name
-        self.op_type = op_type
         self.input_list = input_list
         self.output_list = []
         self.value = value
@@ -31,9 +29,7 @@ class tensor(object):
         '''
         if self.name in feed.keys():
             return feed[self.name]
-        if self.op_type is None:
-            raise TensorOpUndefinedError('tensor.op_type not defined')
-        raise TensorOpNotSupported('Unsupported operator type: ' + self.op_type)
+        raise ValueError('not reachable')
 
     def _derivative(self, feed, input, target):
         return 0

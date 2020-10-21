@@ -18,7 +18,6 @@ from sklearn.datasets import load_digits
 import lfdnn
 from lfdnn import tensor
 from lfdnn import operator
-from lfdnn.utils import TensorOpUndefinedError, TensorOpNotSupported
 from lfdnn.numerical_tensor import numerical_accuracy
 
 from model import MLP
@@ -59,18 +58,6 @@ class TestAutoDifferential(unittest.TestCase):
         result_1 = operator.relu(operator.sigmoid(a)).differentiate(a, feed)
         result_2 = operator.sigmoid(a).differentiate(a, feed)
         assert_array_almost_equal(result_1, result_2)
-
-    def test_null_operator(self):
-        a = tensor([1, 2], 'a')
-        feed = {}
-        with self.assertRaises(TensorOpUndefinedError):
-            a.forward(feed)
-
-    def test_unsupported_operator(self):
-        a = tensor([1, 2], 'a', op_type='subtract')
-        feed = {'b': np.array([[5, 6]])}
-        with self.assertRaises(TensorOpNotSupported):
-            a.forward(feed)
 
     def test_numerical_accuracy(self):
         prob_vector = np.array([[0.3, 0.7], [0.6, 0.4]])
