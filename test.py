@@ -1,5 +1,6 @@
 import unittest
 import copy
+import sys
 
 import numpy as np
 
@@ -259,6 +260,8 @@ class TestLogisticModel(unittest.TestCase):
         pass
         
 if __name__=="__main__":
+    if len(sys.argv) > 1:
+        unittest.main()
     test_obj = unittest.main(exit=False)
     q1 = 5
     q2 = 5
