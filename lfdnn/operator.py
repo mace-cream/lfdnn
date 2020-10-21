@@ -15,10 +15,9 @@ class matmul(tensor):
         x1.output_list.append(self)
         if x1 is not x2:
             x2.output_list.append(self)
-    def eval(self, feed):
+    def _eval(self, feed):
         result = np.matmul(self.input_list[0].eval(
                 feed), self.input_list[1].eval(feed))
-        feed.update({self.name: result})
         return result
     def _derivative(self, feed, input, target):
         gradient = 0
@@ -36,10 +35,9 @@ class add(tensor):
         x1.output_list.append(self)
         if x1 is not x2:
             x2.output_list.append(self)
-    def eval(self, feed):
+    def _eval(self, feed):
         result = self.input_list[0].eval(feed) + \
                  self.input_list[1].eval(feed)
-        feed.update({self.name: result})
         return result
     def _derivative(self, feed, input, target):
         dim_difference = len(self.shape) - len(input.shape)
@@ -58,9 +56,8 @@ class sigmoid(tensor):
     def __init__(self, x):
         super().__init__(x.shape,NM.get('sigmoid'), [x])
         x.output_list.append(self)
-    def eval(self, feed):
+    def _eval(self, feed):
         result = _sigmoid(self.input_list[0].eval(feed))
-        feed.update({self.name: result})
         return result
     def _derivative(self, feed, input, target):
         # write down the derivative of sigmoid here
@@ -72,10 +69,9 @@ class relu(tensor):
     def __init__(self, x):
         super().__init__(x.shape, NM.get('relu'), [x])
         x.output_list.append(self)
-    def eval(self, feed):
+    def _eval(self, feed):
         result = self.input_list[0].eval(feed)
         result[result < 0] = 0
-        feed.update({self.name: result})
         return result
     def _derivative(self, feed, input, target):
         # input must be in self.input_list
@@ -87,9 +83,8 @@ class log(tensor):
     def __init__(self, x):
         super().__init__(x.shape, NM.get('log'), [x])
         x.output_list.append(self)
-    def eval(self, feed):
+    def _eval(self, feed):
         result = np.log(self.input_list[0].eval(feed))
-        feed.update({self.name: result})
         return result
     def _derivative(self, feed, input, target):
         return 1 / input.eval(feed) * self.back(target, feed)
@@ -103,12 +98,11 @@ class product(tensor):
         x1.output_list.append(self)
         if x1 is not x2:
             x2.output_list.append(self)
-    def eval(self, feed):
+    def _eval(self, feed):
         # write down the evaluation of product here
         # you should modify the following line
         result = self.input_list[0].eval(feed)
         # end of your writing
-        feed.update({self.name: result})
         return result
     def _derivative(self, feed, input, target):
         gradient = 0
@@ -126,9 +120,8 @@ class softmax(tensor):
     def __init__(self, x):
         super().__init__(x.shape, NM.get('softmax'), [x])
         x.output_list.append(self)
-    def eval(self, feed):
+    def _eval(self, feed):
         result = _softmax(self.input_list[0].eval(feed))
-        feed.update({self.name: result})
         return result
 
 class log_softmax(tensor):
@@ -137,10 +130,9 @@ class log_softmax(tensor):
     def __init__(self, x):
         super().__init__(x.shape, NM.get('log_softmax'), [x])
         x.output_list.append(self)
-    def eval(self, feed):
+    def _eval(self, feed):
         logit = self.input_list[0].eval(feed)
         result = logit - np.log(np.sum(np.exp(logit), 1, keepdims=True))
-        feed.update({self.name: result})
         return result
     def _derivative(self, feed, input, target):
         logits = _softmax(input.eval(feed))
@@ -159,9 +151,8 @@ class reduce_sum(tensor):
     def __init__(self, x):
         super().__init__([1, 1], NM.get('reduce_sum'), [x])
         x.output_list.append(self)
-    def eval(self, feed):
+    def _eval(self, feed):
         result = np.sum(self.input_list[0].eval(feed))
-        feed.update({self.name: result})
         return result
     def _derivative(self, feed, input, target):
         return np.ones(input.shape) * self.back(target, feed)
@@ -177,9 +168,8 @@ class scale(tensor):
     def __init__(self, x, alpha):
         super().__init__(x.shape, NM.get('scale'), [x, alpha])
         x.output_list.append(self)
-    def eval(self, feed):
+    def _eval(self, feed):
         result = self.input_list[1] * self.input_list[0].eval(feed)
-        feed.update({self.name: result})
         return result
     def _derivative(self, feed, input, target):
         return self.input_list[1] * self.back(target, feed)
@@ -227,9 +217,8 @@ class accuracy(tensor):
         super().__init__([1,1], NM.get('accuracy'), [pred, y])
         pred.output_list.append(self)
         y.output_list.append(self)
-    def eval(self, feed):
+    def _eval(self, feed):
         result = np.mean(np.argmax(self.input_list[0].eval(
                 feed), -1) == np.argmax(self.input_list[1].eval(feed), -1))
-        feed.update({self.name: result})
         return result
 

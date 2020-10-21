@@ -11,6 +11,7 @@ class tensor(object):
         self.input_list = input_list
         self.output_list = []
         self.value = value
+
     def forward(self, feed):
         '''
         evaluate the function given feed data
@@ -29,7 +30,12 @@ class tensor(object):
         '''
         if self.name in feed.keys():
             return feed[self.name]
-        raise ValueError('not reachable')
+        result = self._eval(feed)
+        feed.update({self.name: result})
+        return result
+
+    def _eval(self, feed):
+        return 0
 
     def _derivative(self, feed, input, target):
         return 0
