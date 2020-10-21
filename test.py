@@ -265,7 +265,9 @@ if __name__=="__main__":
     q3 = 0
     if len(test_obj.result.skipped) == 0:
         q3 = 2.5
-    for failure in test_obj.result.failures:
+    f_or_e = test_obj.result.failures
+    f_or_e.extend(test_obj.result.errors)
+    for failure in f_or_e:
         if str(failure[0]).find('AutoDifferential') > 0 and q1 > 0:
             q1 -= 1
         elif str(failure[0]).find('MLP') > 0 and q2 > 0:
