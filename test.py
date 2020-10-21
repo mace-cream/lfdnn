@@ -119,17 +119,17 @@ class TestMLP(unittest.TestCase):
 
     def test_multiple_layer_with_regulation(self):
         # test on UCI ML hand-written digits datasets
-        mlp = MLP(hidden_layer_sizes=(32, 16), epoch_num=60, batch_size=32, learning_rate=0.2, _lambda=0.1)
+        mlp = MLP(hidden_layer_sizes=(30,), epoch_num=600, batch_size=32, learning_rate=0.2, _lambda=0.05)
         digits = load_digits()
         n_samples = len(digits.images)
         x_train = digits.data[:n_samples // 2]
         y_train = digits.target[:n_samples // 2]
         np.random.seed(2020)
         mlp.train(x_train, y_train)
-        self.assertTrue(numerical_accuracy(mlp.predict(x_train), y_train) > 0.98)
+        self.assertTrue(numerical_accuracy(mlp.predict(x_train), y_train) > 0.99)
         x_test = digits.data[n_samples // 2:]
         y_test = digits.target[n_samples // 2:]
-        self.assertTrue(numerical_accuracy(mlp.predict(x_test), y_test) > 0.86)
+        self.assertTrue(numerical_accuracy(mlp.predict(x_test), y_test) > 0.93)
 
     def test_iris(self):
         # test softmax on Iris dataset
