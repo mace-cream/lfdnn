@@ -147,6 +147,12 @@ class product(tensor):
         return gradient
 
 class softmax(tensor):
+    '''tensor for matrix softmax function
+
+    Parameters
+    ----------
+    x: tensor, input tensor
+    '''
     def __init__(self, x):
         super().__init__(x.shape, NM.get('softmax'), [x])
         x.output_list.append(self)
@@ -155,7 +161,11 @@ class softmax(tensor):
         return result
 
 class log_softmax(tensor):
-    '''log(softmax(x))
+    '''tensor for log softmax function
+
+    Parameters
+    ----------
+    x: tensor, input tensor
     '''
     def __init__(self, x):
         super().__init__(x.shape, NM.get('log_softmax'), [x])
@@ -178,17 +188,27 @@ class log_softmax(tensor):
         return local_gradient
 
 class reduce_sum(tensor):
+    '''tensor for reduced sum
+
+    Notice: this is a special tensor since its `_eval` function gives a numerical
+    value instead of a matrix.
+
+    Parameters
+    ----------
+    x: tensor, input tensor
+    '''
     def __init__(self, x):
         super().__init__([1, 1], NM.get('reduce_sum'), [x])
         x.output_list.append(self)
     def _eval(self, feed):
+        # reduced sum along all axises
         result = np.sum(self.input_list[0].eval(feed))
         return result
     def _derivative(self, feed, input, target):
         return np.ones(input.shape) * self.back(target, feed)
 
 class scale(tensor):
-    '''multiply a tensor x by a scalar alpha
+    '''tensor for scalar multiplication, alpha * x
 
     Parameters
     ----------
@@ -205,7 +225,12 @@ class scale(tensor):
         return self.input_list[1] * self.back(target, feed)
 
 class accuracy(tensor):
-    '''the fraction of right prediction
+    '''tensor for accuracy, used in multi-class classification task
+
+    Parameters
+    ----------
+    pred: tensor, prediction results
+    y: tensor, true label
     '''
     def __init__(self, pred, y):
         super().__init__([1,1], NM.get('accuracy'), [pred, y])
@@ -217,25 +242,44 @@ class accuracy(tensor):
         return result
 
 def mean_square_sum(x):
+    '''mean square sum, or square of Frobenius norm
+
+    Parameters
+    ----------
+    x: tensor
+
+    Returns
+    -------
+    tensor object    
+    '''
     out = reduce_mean(product(x, x))
     return out
 
 def reduce_mean(x):
     '''mean value of x along axis = 0
+
+    Parameters
+    ----------
+    x: tensor
+
+    Returns
+    -------
+    tensor object
     '''
     out = scale(reduce_sum(x), 1.0 / x.shape[0])
     return out
 
 def mse(x, y):
     '''mean square error
-       Parameters
-       ----------
-       x: tensor
-       y: tensor
 
-       Returns
-       -------
-       tensor object, which is the mean squared error of x
+    Parameters
+    ----------
+    x: tensor
+    y: tensor
+
+    Returns
+    -------
+    tensor object, which is the mean squared error of x
     '''
     # put your composition model here
     out = reduce_mean(x)
@@ -244,7 +288,17 @@ def mse(x, y):
 
 def CE(x, y):
     '''average cross-entropy multiplied by -1
-    see the explanation: https://en.wikipedia.org/wiki/Cross_entropy#Cross-entropy_loss_function_and_logistic_regression
+    for detail, see the explanation:
+    https://en.wikipedia.org/wiki/Cross_entropy#Cross-entropy_loss_function_and_logistic_regression
+
+    Parameters
+    ----------
+    x: tensor
+    y: tensor
+
+    Returns
+    -------
+    tensor object
     '''
     out = scale(reduce_mean(product(y, log(x))), -1)
     return out
@@ -252,6 +306,15 @@ def CE(x, y):
 def CE_with_logit(x, y):
     '''loss function for multi-class classification
        logit means the output part before the softmax
+
+    Parameters
+    ----------
+    x: tensor
+    y: tensor
+
+    Returns
+    -------
+    tensor object
     '''
     out = scale(reduce_mean(product(y, log_softmax(x))), -1)
     return out

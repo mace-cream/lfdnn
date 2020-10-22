@@ -8,6 +8,7 @@ class Logistic:
     """
     logistic regression using MLP implementation
     also support softmax regression
+
     Parameters
     ----------
     tol: double, optional, the stopping criteria for the weights
@@ -30,10 +31,12 @@ class Logistic:
     def train(self, x_train, y_train):
         """Receive the input training data, then learn the model.
            using the API of multilayer perception
+
         Parameters
         ----------
         x_train: np.array, shape (num_samples, num_features)
         y_train: np.array, shape (num_samples, )
+
         Returns
         -------
         None
@@ -61,9 +64,11 @@ class Logistic:
 
     def predict(self, x_test):
         """Predict class labels for samples in x_test
+
         Parameters
         ----------
         x_test: np.array, shape (num_samples, num_features)
+
         Returns
         -------
         pred: np.array, shape (num_samples, )
@@ -80,9 +85,11 @@ class Logistic:
 
     def predict_proba(self, x_data):
         """Predict class labels for samples in x_test
+
         Parameters
         ----------
         x_data: np.array, shape (num_samples, num_features)
+
         Returns
         -------
         pred: np.array, shape (num_samples, n_classes),
