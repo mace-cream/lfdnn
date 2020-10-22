@@ -7,9 +7,13 @@ from lfdnn import Graph, operator
 class RidgeRegression(Graph):
     """
     ridge regression using Automatic differentiation
+
     Parameters
     ----------
-    alpha: regularization parameter
+    alpha: double, regularization parameter
+    learning_rate: double, learning rate in SGD
+    epoch_num: int, number of iteration
+    batch_size: int, batch size used in SGD, default to all data
     """
     def __init__(self, alpha=1.0, learning_rate=0.05, epoch_num=100, batch_size='auto'):
         # modify self.skip = False to run the extra test for bonus question

@@ -5,12 +5,19 @@ from lfdnn.utils import _sigmoid, _softmax
 from lfdnn.utils import one_hot
 
 class tensor(object):
+    '''rank 2 tensor object for autodiff
+    
+    Parameters
+    ----------
+    shape: list, shape of the tensor
+    name: str, name of the tensor, unique for each instance
+    input_list: list, contains the input tensor, maximal length is 2
+    '''
     def __init__(self, shape, name, input_list=None, value=None):
         self.shape = shape
         self.name = name
         self.input_list = input_list
         self.output_list = []
-        self.value = value
 
     def forward(self, feed):
         '''
@@ -56,6 +63,7 @@ class tensor(object):
 
 
 class NameManager(object):
+    '''tensor name manager in global'''
     def __init__(self):
         self.nameList = {}
 
@@ -69,7 +77,7 @@ class NameManager(object):
 
 class Graph:
     '''base class for machine learning objective function
-       the optimizer is based on stochastic gradient descent
+       the optimizer is based on stochastic gradient descent (SGD)
     '''
     def __init__(self, learning_rate=0.05, epoch_num=1, batch_size='auto'):
         self.learning_rate = learning_rate

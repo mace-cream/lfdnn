@@ -5,9 +5,13 @@ from lfdnn import operator
 
 class MLP(lfdnn.Graph):
     '''
+        multi-layer perception
+
+        Parameters
+        ----------
         epoch_num: int, number of epochs in traning
         batch_size: int, batch size used in SGD, default to all data
-        hidden_layer_sizes: array-like,　the number of nodes at each hidden layer
+        hidden_layer_sizes: tuple,　the number of nodes at each hidden layer
         learning_rate: double, learning rate in SGD
         _lambda: double, regularization parameter
     '''

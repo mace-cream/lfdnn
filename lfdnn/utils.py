@@ -6,6 +6,12 @@ import numpy as np
 
 
 def one_hot(x, depth):
+    '''one hot encoding of data
+
+    Parameters
+    ----------
+    depth: int, number of classes in use
+    '''
     if depth == 1:
         # simply reshape 1d array to column vector
         return x.reshape([len(x), -1])
@@ -15,8 +21,10 @@ def one_hot(x, depth):
     return (result == x_inner) * 1.0
 
 def _sigmoid(x):
+    '''numerical sigmoid'''
     return 1 / (1 + np.exp(-x))
 
 def _softmax(x):
+    '''numerical softmax'''
     result = (np.exp(x).T / np.sum(np.exp(x), 1)).T
     return result

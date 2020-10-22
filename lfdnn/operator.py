@@ -3,11 +3,16 @@ import numpy as np
 from lfdnn.tensor import tensor, NameManager
 from lfdnn.utils import _sigmoid, _softmax
 
+# initialize the global tensor name manager
 NM = NameManager()
 
 class matmul(tensor):
-    '''
-        matrix multiplication
+    '''tensor for matrix multiplication
+
+    Parameters
+    ----------
+    x1: tensor, input tensor 1
+    x2: tensor, input tensor 2
     '''
     def __init__(self, x1, x2):
         super().__init__(x1.shape[:-1] + x2.shape[1:],
@@ -30,6 +35,13 @@ class matmul(tensor):
         return gradient
 
 class add(tensor):
+    '''tensor for matrix add
+
+    Parameters
+    ----------
+    x1: tensor, input tensor 1
+    x2: tensor, input tensor 2
+    '''    
     def __init__(self, x1, x2):
         super().__init__(x1.shape, NM.get('add'), [x1, x2])
         x1.output_list.append(self)
@@ -53,6 +65,12 @@ class add(tensor):
         return gradient
 
 class sigmoid(tensor):
+    '''tensor for matrix elementwise sigmoid activation
+
+    Parameters
+    ----------
+    x: tensor, input tensor
+    '''    
     def __init__(self, x):
         super().__init__(x.shape,NM.get('sigmoid'), [x])
         x.output_list.append(self)
@@ -66,6 +84,12 @@ class sigmoid(tensor):
         return jacob * self.back(target, feed)
         
 class relu(tensor):
+    '''tensor for matrix elementwise relu activation
+
+    Parameters
+    ----------
+    x: tensor, input tensor
+    '''    
     def __init__(self, x):
         super().__init__(x.shape, NM.get('relu'), [x])
         x.output_list.append(self)
@@ -80,6 +104,12 @@ class relu(tensor):
         return local_gradient * self.back(target, feed)
 
 class log(tensor):
+    '''tensor for matrix elementwise log function
+
+    Parameters
+    ----------
+    x: tensor, input tensor
+    '''        
     def __init__(self, x):
         super().__init__(x.shape, NM.get('log'), [x])
         x.output_list.append(self)
@@ -90,8 +120,12 @@ class log(tensor):
         return 1 / input.eval(feed) * self.back(target, feed)
 
 class product(tensor):
-    '''
-    elementwise multiplication of two tensors
+    '''tensor for matrix elementwise multiplication
+
+    Parameters
+    ----------
+    x1: tensor, input tensor 1
+    x2: tensor, input tensor 2
     '''
     def __init__(self, x1, x2):
         super().__init__(x1.shape, NM.get('product'), [x1, x2])
@@ -111,10 +145,6 @@ class product(tensor):
         if input is self.input_list[1]:
             gradient += self.back(target, feed) * self.input_list[0].eval(feed)
         return gradient
-
-def mean_square_sum(x):
-    out = reduce_mean(product(x, x))
-    return out
 
 class softmax(tensor):
     def __init__(self, x):
@@ -174,6 +204,22 @@ class scale(tensor):
     def _derivative(self, feed, input, target):
         return self.input_list[1] * self.back(target, feed)
 
+class accuracy(tensor):
+    '''the fraction of right prediction
+    '''
+    def __init__(self, pred, y):
+        super().__init__([1,1], NM.get('accuracy'), [pred, y])
+        pred.output_list.append(self)
+        y.output_list.append(self)
+    def _eval(self, feed):
+        result = np.mean(np.argmax(self.input_list[0].eval(
+                feed), -1) == np.argmax(self.input_list[1].eval(feed), -1))
+        return result
+
+def mean_square_sum(x):
+    out = reduce_mean(product(x, x))
+    return out
+
 def reduce_mean(x):
     '''mean value of x along axis = 0
     '''
@@ -210,15 +256,5 @@ def CE_with_logit(x, y):
     out = scale(reduce_mean(product(y, log_softmax(x))), -1)
     return out
 
-class accuracy(tensor):
-    '''the fraction of right prediction
-    '''
-    def __init__(self, pred, y):
-        super().__init__([1,1], NM.get('accuracy'), [pred, y])
-        pred.output_list.append(self)
-        y.output_list.append(self)
-    def _eval(self, feed):
-        result = np.mean(np.argmax(self.input_list[0].eval(
-                feed), -1) == np.argmax(self.input_list[1].eval(feed), -1))
-        return result
+
 

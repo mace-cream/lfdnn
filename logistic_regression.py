@@ -12,6 +12,7 @@ class Logistic:
     ----------
     tol: double, optional, the stopping criteria for the weights
     max_iter: int, optional, the maximal number of iteration
+    learning_rate: double, learning rate in SGD
     """
     def __init__(self, tol=1e-4, max_iter=400, learning_rate=0.1):
         self.tol = tol
