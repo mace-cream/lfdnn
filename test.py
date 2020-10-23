@@ -182,6 +182,7 @@ class TestRidgeModel(unittest.TestCase):
         X = np.concatenate((X, X), axis=0)
 
         ridge = RidgeRegression(alpha=0)
+        np.random.seed(2020)
         ridge.train(X, y)
         self.assertGreater(ridge.score(X, y), 0.9)
 
