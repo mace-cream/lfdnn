@@ -287,7 +287,7 @@ def mse(x, y):
     return out
 
 def CE(x, y):
-    '''average cross-entropy multiplied by -1
+    '''cross-entropy
     for detail, see the explanation:
     https://en.wikipedia.org/wiki/Cross_entropy#Cross-entropy_loss_function_and_logistic_regression
 
