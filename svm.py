@@ -1,24 +1,23 @@
 import numpy as np
-from sklearn.metrics import r2_score
 
 import lfdnn
 from lfdnn import Graph, operator
 
-class RidgeRegression(Graph):
+class SVM(Graph):
     """
-    ridge regression using Automatic differentiation
+    soft margin svm
 
     Parameters
     ----------
-    alpha: double, regularization parameter
+    C: double, positive number for regularization
     learning_rate: double, learning rate in SGD
     epoch_num: int, number of iteration
     batch_size: int, batch size used in SGD, default to all data
     """
-    def __init__(self, alpha=1.0, learning_rate=0.05, epoch_num=100, batch_size='auto'):
+    def __init__(self, C=1.0, learning_rate=0.05, epoch_num=100, batch_size='auto'):
         # modify self.skip = False to run the extra test for bonus question
         self.skip = True
-        self.alpha = alpha
+        self.C = C
         super().__init__(learning_rate=learning_rate, epoch_num=epoch_num, batch_size=batch_size)
         pass
 
@@ -52,9 +51,6 @@ class RidgeRegression(Graph):
 
     def train(self, x_train, y_train):
         super().train(x_train, y_train)
-        self.theta = self.weight_value['output_weight']
+        self.w = self.weight_value['output_weight']
         self.b = self.weight_value['output_bias']
 
-    def score(self, X, y):
-        y_pred = self.predict(X)
-        return r2_score(y, y_pred)

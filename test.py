@@ -84,6 +84,14 @@ class TestAutoDifferential(unittest.TestCase):
         feed = {'a': np.array([[1, -1, 3]])}
         assert_array_almost_equal(operator.relu(a).forward(feed), np.array([[1, 0, 3]]))
 
+    def test_abs(self):
+        a = tensor([1, 3], 'a')
+        feed = {'a': np.array([[1, -1, 3]])}
+        assert_array_almost_equal(operator.abs(a).forward(feed), np.array([[1, 1, 3]]))
+        result_1 = operator.abs(operator.scale(a, 2)).differentiate(a, feed)
+        result_2 = 2 * np.array([[1, -1, 1]])
+        assert_array_almost_equal(result_1, result_2)
+
     def test_cross_entropy(self):
         x = tensor([3, 3], 'x')
         y = tensor([3, 3], 'y')

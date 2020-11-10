@@ -51,14 +51,14 @@ class tensor(object):
         '''Define the gradient back propagation with respect to 'target' given input 'feed'
         '''
         if self.name + '_g' in feed.keys():
-            return feed[self.name+'_g']
+            return feed[self.name + '_g']
         if self is target:
             return np.ones(self.shape)
         gradient = 0
         for out in self.output_list:
             gradient += out._derivative(feed, self, target)
 
-        feed.update({self.name+'_g': gradient})
+        feed.update({self.name + '_g': gradient})
         return gradient
 
 

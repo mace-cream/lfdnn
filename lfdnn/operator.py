@@ -79,7 +79,8 @@ class sigmoid(tensor):
         return result
     def _derivative(self, feed, input, target):
         # write down the derivative of sigmoid here
-        jacob = 1
+        jacob = self.eval(feed) * \
+                    (1 - self.eval(feed))
         # end of your writing
         return jacob * self.back(target, feed)
         
@@ -119,6 +120,25 @@ class log(tensor):
     def _derivative(self, feed, input, target):
         return 1 / input.eval(feed) * self.back(target, feed)
 
+class abs(tensor):
+    '''tensor for absolute value function
+
+    Parameters
+    ----------
+    x: tensor, input tensor
+    '''        
+    def __init__(self, x):
+        super().__init__(x.shape, NM.get('abs'), [x])
+        x.output_list.append(self)
+    def _eval(self, feed):
+        result = np.abs(self.input_list[0].eval(feed))
+        return result
+    def _derivative(self, feed, input, target):
+        local_gradient = input.eval(feed)
+        local_gradient = (local_gradient > 0) * 1.0
+        local_gradient = 2 * local_gradient - 1
+        return local_gradient * self.back(target, feed)        
+
 class product(tensor):
     '''tensor for matrix elementwise multiplication
 
@@ -135,7 +155,7 @@ class product(tensor):
     def _eval(self, feed):
         # write down the evaluation of product here
         # you should modify the following line
-        result = self.input_list[0].eval(feed)
+        result = self.input_list[0].eval(feed) * self.input_list[1].eval(feed)
         # end of your writing
         return result
     def _derivative(self, feed, input, target):
@@ -282,7 +302,7 @@ def mse(x, y):
     tensor object, which is the mean squared error of x
     '''
     # put your composition model here
-    out = reduce_mean(x)
+    out = mean_square_sum(add(x, scale(y, -1)))
     # end of your writing
     return out
 
