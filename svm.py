@@ -46,13 +46,7 @@ class SVM(Graph):
         self.weight['output_bias'] = b        
         # put your code here, you can adjust the following lines
         self.output = operator.add(operator.matmul(self.input, w), b)
-        h = operator.product(self.label, self.output)
-        all_one_tensor = lfdnn.tensor([1, output_dim], '1', value=1)
-        h = operator.add(all_one_tensor, operator.scale(h, -1))
-        h = operator.add(operator.abs(h), h)
-        h = operator.scale(operator.reduce_sum(h), self.C)
-        self.loss = operator.add(h, operator.reduce_sum(operator.product(w, w)))
-        # 1/2 * self.loss
+        self.loss = self.output
         # end of your modification
         # dummy acc
         self.accuracy = self.loss

@@ -10,5 +10,3 @@ You need to modify `ridge_regression.py`, change the `skip` attribute to `False`
 to enable the unit test of `TestRidgeModel`. Passing all the tests of
 `TestRidgeModel` then you can get the bonus 2.5 point.
 
-## Sample Answer
-https://github.com/TBSILearningFromDataFall2020/programming-assignment-2----neural-network-jessie-backports/
