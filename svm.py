@@ -1,4 +1,5 @@
 import numpy as np
+from sklearn.metrics import accuracy_score
 
 import lfdnn
 from lfdnn import Graph, operator
@@ -27,7 +28,6 @@ class SVM(Graph):
         # get number of classes
         output_dim = 1
         batch_size = self.batch_size
-        _lambda = self.alpha
         if batch_size == 'auto':
             # use all data
             batch_size = x_train.shape[0]
@@ -40,8 +40,9 @@ class SVM(Graph):
         self.weight['output_bias'] = b        
         # put your code here, you can adjust the following lines
         self.output = operator.add(operator.matmul(self.input, w), b)
-        all_one_tensor = tensor([1, output_dim], '1', value=1)
-        h = operator.add(all_one_tensor, operator.scale(self.output, -1))
+        h = operator.product(self.label, self.output)
+        all_one_tensor = lfdnn.tensor([1, output_dim], '1', value=1)
+        h = operator.add(all_one_tensor, operator.scale(h, -1))
         h = operator.add(operator.abs(h), h)
         h = operator.scale(operator.reduce_sum(h), self.C)
         self.loss = operator.add(h, operator.reduce_sum(operator.product(w, w)))
@@ -54,8 +55,27 @@ class SVM(Graph):
         # alias for train
         self.train(x_train, y_train)
 
+    def predict(self, x_test):
+        """Predict class labels for samples in x_test
+
+        Parameters
+        ----------
+        x_test: np.array, shape (num_samples, num_features)
+
+        Returns
+        -------
+        pred: np.array, shape (num_samples, )
+        """
+        num_of_data = x_test.shape[0]
+        classes_ = (x_test @ self.w + self.b ) > 0
+        classes = 2 * classes_ - 1
+        return classes.reshape([num_of_data])
+
     def train(self, x_train, y_train):
         super().train(x_train, y_train)
         self.w = self.weight_value['output_weight']
         self.b = self.weight_value['output_bias']
 
+    def score(self, X, y):
+        y_pred = self.predict(X)
+        return accuracy_score(y, y_pred)

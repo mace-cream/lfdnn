@@ -11,6 +11,8 @@ from sklearn.linear_model._logistic import _logistic_loss
 from sklearn.linear_model import Ridge
 from sklearn.linear_model import LinearRegression
 from sklearn.linear_model import LogisticRegression
+from sklearn.svm import LinearSVC
+from svm import SVM
 from sklearn.metrics import mean_squared_error
 from sklearn.utils._testing import assert_array_almost_equal
 from sklearn.utils._testing import assert_array_equal
@@ -278,7 +280,22 @@ class TestLogisticModel(unittest.TestCase):
         clf_loss = clf.log_loss(X, y)
         self.assertTrue(np.abs(lr1_loss - clf_loss) < 0.4)
         pass
-        
+
+class TestSVM(unittest.TestCase):
+    def test_binary(self):
+        # Test svm on a binary problem.
+        iris = load_iris()
+        target = (iris.target > 0).astype(np.intp)
+        target = target * 2 - 1 # y = 1 or y = -1
+        np.random.seed(2010)
+        svm = LinearSVC(loss='hinge')
+        svm.fit(iris.data, target)
+        custom_svm = SVM(epoch_num=1500, learning_rate=0.051)
+        custom_svm.train(iris.data, target)
+        print(svm.coef_, svm.intercept_)
+        print(custom_svm.w, custom_svm.b)
+        self.assertAlmostEqual(custom_svm.score(iris.data, target), 1.0)
+
 if __name__=="__main__":
     if len(sys.argv) > 1:
         unittest.main()
