@@ -4,6 +4,12 @@ from sklearn.metrics import accuracy_score
 import lfdnn
 from lfdnn import Graph, operator
 
+def _svm_loss(X, y, w, b, C):
+    term_1 = np.linalg.norm(w) ** 2 / 2
+    term_2 = 1 - y * (X @ w + b)
+    term_2 = (term_2 + np.abs(term_2)) / 2
+    return term_1 + np.sum(term_2) * C
+
 class SVM(Graph):
     """
     soft margin svm
@@ -69,12 +75,14 @@ class SVM(Graph):
         num_of_data = x_test.shape[0]
         classes_ = (x_test @ self.w + self.b ) > 0
         classes = 2 * classes_ - 1
-        return classes.reshape([num_of_data])
+        return classes
 
     def train(self, x_train, y_train):
         super().train(x_train, y_train, verbose=False)
-        self.w = self.weight_value['output_weight']
-        self.b = self.weight_value['output_bias']
+        candidate_w = self.weight_value['output_weight']
+        self.w = candidate_w.reshape([candidate_w.shape[0]])
+        candidate_b = self.weight_value['output_bias']
+        self.b = candidate_b.reshape([candidate_b.shape[0]])
 
     def score(self, X, y):
         y_pred = self.predict(X)

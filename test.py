@@ -12,7 +12,7 @@ from sklearn.linear_model import Ridge
 from sklearn.linear_model import LinearRegression
 from sklearn.linear_model import LogisticRegression
 from sklearn.svm import LinearSVC
-from svm import SVM
+from svm import SVM, _svm_loss
 from sklearn.metrics import mean_squared_error
 from sklearn.utils._testing import assert_array_almost_equal
 from sklearn.utils._testing import assert_array_equal
@@ -290,10 +290,11 @@ class TestSVM(unittest.TestCase):
         np.random.seed(2010)
         svm = LinearSVC(loss='hinge')
         svm.fit(iris.data, target)
-        custom_svm = SVM(epoch_num=1500, learning_rate=0.001)
+        custom_svm = SVM(epoch_num=2500, learning_rate=0.001)
         custom_svm.train(iris.data, target)
-        print(svm.coef_, svm.intercept_)
-        print(custom_svm.w, custom_svm.b)
+        optimal_loss = _svm_loss(iris.data, target, svm.coef_.reshape([4]), svm.intercept_, 1.0)
+        custom_loss = _svm_loss(iris.data, target, custom_svm.w, custom_svm.b, 1.0)
+        self.assertTrue(optimal_loss + 0.2 > custom_loss)
         self.assertAlmostEqual(custom_svm.score(iris.data, target), 1.0)
 
 if __name__=="__main__":
