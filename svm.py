@@ -40,11 +40,16 @@ class SVM(Graph):
         self.weight['output_bias'] = b        
         # put your code here, you can adjust the following lines
         self.output = operator.add(operator.matmul(self.input, w), b)
-        self.loss = operator.add(operator.mse(self.output, self.label), operator.scale(operator.mean_square_sum(w), self.alpha))
+        all_one_tensor = tensor([1, output_dim], '1', value=1)
+        h = operator.add(all_one_tensor, operator.scale(self.output, -1))
+        h = operator.add(operator.abs(h), h)
+        h = operator.scale(operator.reduce_sum(h), self.C)
+        self.loss = operator.add(h, operator.reduce_sum(operator.product(w, w)))
+        # 1/2 * self.loss
         # end of your modification
         # dummy acc
         self.accuracy = self.loss
-
+        
     def fit(self, x_train, y_train):
         # alias for train
         self.train(x_train, y_train)

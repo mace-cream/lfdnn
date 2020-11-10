@@ -12,13 +12,14 @@ class tensor(object):
     shape: list, shape of the tensor
     name: str, name of the tensor, unique for each instance
     input_list: list, contains the input tensor, maximal length is 2
+    value: for constant tensors, equal to the value of this tensor
     '''
-    def __init__(self, shape, name, input_list=None, value=None):
+    def __init__(self, shape, name, input_list=None, value=0):
         self.shape = shape
         self.name = name
         self.input_list = input_list
         self.output_list = []
-
+        self.value = value
     def forward(self, feed):
         '''
         evaluate the function given feed data
@@ -42,10 +43,10 @@ class tensor(object):
         return result
 
     def _eval(self, feed):
-        return 0
+        return self.value * np.ones(self.shape)
 
     def _derivative(self, feed, input, target):
-        return 0
+        return np.zeros(self.shape) * self.back(target, feed)
 
     def back(self, target, feed):
         '''Define the gradient back propagation with respect to 'target' given input 'feed'

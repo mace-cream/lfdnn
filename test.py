@@ -30,6 +30,17 @@ class TestAutoDifferential(unittest.TestCase):
         a = tensor([1, 2], 'a')
         self.assertEqual(operator.reduce_mean(a).shape, [1, 1])
 
+    def test_constant_tensor(self):
+        a = tensor([2, 2], 'a', value=3)
+        assert_array_almost_equal(a.forward({}), 3 * np.ones([2, 2]))
+
+    def test_constant_tensor_derivative(self):
+        a = tensor([2, 2], 'a', value=3)
+        b = tensor([2, 2], 'b')
+        feed = {'b': np.array([[5, 6], [7, 8]])}
+        assert_array_almost_equal(operator.reduce_sum(operator.product(a, b)).differentiate(b, feed),
+            3 * np.ones([2, 2]))
+
     def test_forward(self):
         a = tensor([2], 'a')
         feed = {'a': np.array([5, 6])}
