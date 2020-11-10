@@ -290,7 +290,7 @@ class TestSVM(unittest.TestCase):
         np.random.seed(2010)
         svm = LinearSVC(loss='hinge')
         svm.fit(iris.data, target)
-        custom_svm = SVM(epoch_num=1500, learning_rate=0.051)
+        custom_svm = SVM(epoch_num=1500, learning_rate=0.001)
         custom_svm.train(iris.data, target)
         print(svm.coef_, svm.intercept_)
         print(custom_svm.w, custom_svm.b)

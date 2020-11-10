@@ -26,6 +26,9 @@ class Logistic:
 
     def _iteration_step(self, x_train, y_train):
         # put your training code here
+        self.mlp._epoch_iterate(x_train, y_train)
+        weight_matrix = self.mlp.weight_value['output_weight']
+        self.theta = weight_matrix[:, 1] - weight_matrix[:, 0]       
         pass
 
     def train(self, x_train, y_train):

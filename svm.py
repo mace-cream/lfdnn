@@ -72,7 +72,7 @@ class SVM(Graph):
         return classes.reshape([num_of_data])
 
     def train(self, x_train, y_train):
-        super().train(x_train, y_train)
+        super().train(x_train, y_train, verbose=False)
         self.w = self.weight_value['output_weight']
         self.b = self.weight_value['output_bias']
 
