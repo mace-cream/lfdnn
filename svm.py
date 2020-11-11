@@ -45,6 +45,7 @@ class SVM(Graph):
         b = lfdnn.tensor([1, output_dim], 'output_bias')
         self.weight['output_bias'] = b        
         # put your code here, you can adjust the following lines
+        self.output = operator.add(operator.matmul(self.input, w), b)
         h = operator.product(self.label, self.output)
         all_one_tensor = lfdnn.tensor([1, output_dim], '1', value=1)
         h = operator.add(all_one_tensor, operator.scale(h, -1))
