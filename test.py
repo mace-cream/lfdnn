@@ -172,7 +172,6 @@ class TestMLP(unittest.TestCase):
         mlp.train(X, Y)
         self.assertAlmostEqual(numerical_accuracy(mlp.predict(X), Y), 1.0)
 
-@unittest.skipIf(RidgeRegression().skip, 'skip bonus question')
 class TestRidgeModel(unittest.TestCase):
     def test_ridge(self):
         # Ridge regression convergence test
@@ -298,27 +297,5 @@ class TestSVM(unittest.TestCase):
         self.assertAlmostEqual(custom_svm.score(iris.data, target), 1.0)
 
 if __name__=="__main__":
-    if len(sys.argv) > 1:
-        unittest.main()
-    test_obj = unittest.main(exit=False)
-    q1 = 5
-    q2 = 5
-    q3 = 0
-    if len(test_obj.result.skipped) == 0:
-        q3 = 2.5
-    f_or_e = test_obj.result.failures
-    f_or_e.extend(test_obj.result.errors)
-    for failure in f_or_e:
-        if str(failure[0]).find('AutoDifferential') > 0 and q1 > 0:
-            q1 -= 1
-        elif str(failure[0]).find('MLP') > 0 and q2 > 0:
-            q2 -= 1
-        elif str(failure[0]).find('LogisticModel') > 0 and q2 > 0:
-            q2 -= 1
-        elif str(failure[0]).find('RidgeModel') > 0 and q3 > 0:
-            q3 -= 1
-            if q3 < 0:
-                q3 = 0
-    print("Your final score of PA2: ", q1 + q2 + q3)
-    if len(f_or_e) > 0:
-        exit(-1)
+    unittest.main()
+    

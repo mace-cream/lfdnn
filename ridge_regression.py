@@ -16,8 +16,6 @@ class RidgeRegression(Graph):
     batch_size: int, batch size used in SGD, default to all data
     """
     def __init__(self, alpha=1.0, learning_rate=0.05, epoch_num=100, batch_size='auto'):
-        # modify self.skip = False to run the extra test for bonus question
-        self.skip = True
         self.alpha = alpha
         super().__init__(learning_rate=learning_rate, epoch_num=epoch_num, batch_size=batch_size)
         pass
