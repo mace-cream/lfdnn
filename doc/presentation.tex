@@ -36,6 +36,7 @@
 \usepackage{wasysym}
 \usepackage{xmpmulti}
 \usepackage{url}
+\usepackage{subcaption}
 \newcommand{\bTheta}{\bm{\Theta}}
 
 %\newcounter{propCounter} 
@@ -149,27 +150,15 @@
  % \tableofcontents
  %\end{frame}
  
-\begin{frame}
+\begin{frame}{Overview}
 \tableofcontents
 \end{frame}
  
-\begin{frame}{Overview}
 
 %\begin{enumerate}
  %\item 
  
- \begin{itemize}
- % \item Review on Generalized Linear Models
- \item neural network and libraries
-  \item Autodiff and multilayer neural network
-  \begin{itemize}
-  	\item Terminology and API
-  	\item Implementation detail
-  	\item Examples
-  \end{itemize}
-  \item Practical guide
-  \end{itemize}  
-\end{frame}
+
 \section{Artificial neural network as homework}
 \begin{frame}
 \frametitle{Artificial neural network}
@@ -249,10 +238,24 @@ The original description can be found at \url{http://cs231n.github.io/assignment
 	\item Build a logistic regression and linear regression model
 \end{itemize}
 \begin{figure}
-	\includegraphics[width=4cm]{auto-grading.png}
+	\begin{subfigure}[b]{0.5\textwidth}
+	\includegraphics[width=\textwidth]{auto-grading.png}
+	\caption{GitHub Action grading results}
+	\end{subfigure}
+	~
+	\begin{subfigure}[b]{0.35\textwidth}
+	\includegraphics[width=\textwidth]{qrcode.png}
+	\caption{Invitation url}
+	% https://classroom.github.com/a/up8DGVr-
+\end{subfigure}
+
 \end{figure}
 \end{block}
 \end{frame}
+\begin{frame}{Lfdnn}
+
+\end{frame}
+\subsection{Tensor object}
 \begin{frame}[fragile]{Rank 2 tensor}
 \begin{itemize}
 	\item another name for matrix
@@ -275,7 +278,7 @@ feed = {'t': np.random.normal(size=[3, 4])}
 print(b.eval(feed))
 \end{lstlisting}
 \end{frame}
-\section{ Autodiff and multilayer neural network }
+\subsection{ Autodiff and multilayer neural network }
 \begin{frame}[fragile]{Autodiff and multilayer neural network}
 \begin{itemize}
 	\item Autodiff: Automatic differentiation
