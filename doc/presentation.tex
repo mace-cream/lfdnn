@@ -1,4 +1,4 @@
-\documentclass[handout]{beamer} %
+\documentclass[presentation]{beamer} %
 
  
 \mode<presentation>
@@ -134,17 +134,7 @@
 \end{frame}
 
 
-\AtBeginSection[]{%
-  \begin{frame}<beamer> 
-  
-  \tableofcontents[ 
-    currentsubsection, 
-    hideothersubsections, 
-    sectionstyle=show/hide, 
-    subsectionstyle=show/shaded/hide]
-  \end{frame}
-  \addtocounter{framenumber}{-1}% If you don't want them to affect the slide number
-}
+
  % Uncomment these lines for an automatically generated outline.
  %\begin{frame}{Outline}
  % \tableofcontents
@@ -228,6 +218,7 @@ The original description can be found at \url{http://cs231n.github.io/assignment
 \end{itemize}
 \end{frame}
 \section{Learning from data neural network}
+\subsection{Background}
 \begin{frame}
 \textit{Learning from data}, a graduate course of Tsinghua Berkeley Shenzhen Institute
 
@@ -253,7 +244,18 @@ The original description can be found at \url{http://cs231n.github.io/assignment
 \end{block}
 \end{frame}
 \begin{frame}{Lfdnn}
-
+\begin{enumerate}
+	\item neural network library implemented in pure Python
+	\item Install by \texttt{pip install lfdnn}
+	\item provides essential API to build and train neural network model
+\end{enumerate}
+\begin{block}{Components}
+	\begin{description}
+		\item[tensor] base class for all operators
+		\item[operator] specific tensors such as \texttt{add}, \texttt{product}, \texttt{relu}
+		\item[(computational) Graph] implementing sgd optimizer, base class for NN model
+	\end{description}
+\end{block}
 \end{frame}
 \subsection{Tensor object}
 \begin{frame}[fragile]{Rank 2 tensor}
@@ -278,7 +280,7 @@ feed = {'t': np.random.normal(size=[3, 4])}
 print(b.eval(feed))
 \end{lstlisting}
 \end{frame}
-\subsection{ Autodiff and multilayer neural network }
+\subsection{Autodiff and multilayer neural network}
 \begin{frame}[fragile]{Autodiff and multilayer neural network}
 \begin{itemize}
 	\item Autodiff: Automatic differentiation
@@ -321,7 +323,7 @@ class add(tensor):
 \end{lstlisting}
 
 \end{frame}
-\begin{frame}[fragile]{Examples}
+\begin{frame}[fragile]{Implementation details}
 Implement matrix multiplication \texttt{matmul(A,B)}
 \begin{itemize}
 	\item \texttt{A = self.input\_list[0]}
@@ -332,19 +334,26 @@ def _eval(self, feed):
     return A @ B
 \end{lstlisting}
 Suppose \texttt{A} $\neq$ \texttt{B}, using chain rule:
-$\frac{\partial f(A \cdot B)}{\partial A} = \nabla_{AB}f \cdot B^{\mathrm{T}}$
+$\frac{\partial f(A \cdot B)}{\partial A} = \nabla f \cdot B^{\mathrm{T}}$
 
 \begin{lstlisting}[language=Python,numbers=none]
 def _derivative(self, feed, A, target):
     b = self.back(target, feed)
     return b @ B.T
 \end{lstlisting}
-
-\end{frame} 
-\begin{frame}[fragile]{Practical guide}
-\begin{itemize}
-	\item cache the computed value to speed up: \texttt{pring(feed)}
-\end{itemize}
+% cache the computed value to speed up
 \end{frame}
-
+\begin{frame}{Summary}
+\begin{itemize}
+\item Automatic differentiation is a fundamental component of neural network library
+\item Autodiff includes forward pass and backward pass
+\item Contributing to \url{https://github.com/mace-cream/lfdnn} is welcome.
+\end{itemize}
+\pause
+\begin{block}{}
+	\centering
+	\Large
+	Thanks for your listening
+\end{block}
+\end{frame}
 \end{document}
