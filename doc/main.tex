@@ -41,7 +41,7 @@
 	
 	
 	\newcounter{psctr}
-	\setcounter{psctr}{1} % set to the times of problem
+	\setcounter{psctr}{2} % set to the times of problem
 	
 	\runningheader{Programming Assignment \thepsctr}
 	{\textsc{Learning from Data}}
@@ -85,7 +85,7 @@
 	%\vspace{1em}
 	
 	\begin{questions}
-		\question (5 points) \emph{Automatic differentiation} In class, we have learned that to build a neural network, we need to implement the forward
+		\question \emph{Automatic differentiation} In class, we have learned that to build a neural network, we need to implement the forward
 		and backward propagation of given network model. This underlining mechanism is also called Automatic differentiation, autodiff for short.
 		Following the convention of popular neural network library. We call an object with the ability of autodiff \texttt{tensor}.
 		To explain autodiff operation of tensor, we take a single variable function $f(a) = a^2 + 3a$ for an example. Then the tensor object
@@ -128,7 +128,7 @@ s.back(fa) = fa.diff(s) * fa.back(fa)
 		Hint: For rank 0 tensor (scalar) or rank 1 tensor (vector), we can treat
 		them as special rank 2 tensor.
 		
-		\question (5 points) \emph{Multilayer perceptron} You have learned Ridge Regression and softmax regression, which can be treated
+		\question \emph{Multilayer perceptron} You have learned Ridge Regression and softmax regression, which can be treated
 		as special kind of multilayer perceptron. There are no hidden layers in these regression models and their representational power is limited.
 		To represent more complex input-output relationship, we need to introduce hidden layers. For multi-class classification problems, suppose there are $k$ hidden layers,
 		then the mathematical form of multilayer perceptron is as follows:
@@ -154,13 +154,13 @@ s.back(fa) = fa.diff(s) * fa.back(fa)
 		are hidden in the autodiff library.
 
 		Please implement multilayer perceptron classifier by completing the code in \textbf{model.py}.
-		Besides, use your MLP model to re-implement \texttt{logistic regression} in \linebreak[4] \textbf{logistic\_regression.py}, which you have already done with IRLS in PA1.
+		Besides, use your MLP model to implement \texttt{logistic regression} in \linebreak[4] \textbf{logistic\_regression.py}.
 		
-		\question (bonus 2.5 points) \emph{Ridge Regression with autodiff}
-		Please re-implement ridge regression by completing the code in \textbf{ridge\_regression.py}, which you have already implemented with direct solution in PA1.
+		\question \emph{Ridge Regression with autodiff}
+		Please implement ridge regression by completing the code in \textbf{ridge\_regression.py}.
 		You are required to use SGD with the autodiff library of question 1.
 
-		\question (extra) \emph{Soft Margin SVM}
+		\question \emph{Soft Margin SVM}
 		Recall that soft margin SVM is solving
 		the following optimization problem:
 		\begin{align*}
@@ -181,7 +181,7 @@ s.back(fa) = fa.diff(s) * fa.back(fa)
 	\nocite{*}
 	\begin{flushleft}
 		\textbf{Notice}: \\
-		\begin{enumerate}
+		\begin{enumerate}[label=\roman*]
 			\item Use matrix operations other than loops for efficiency. If the running time of Auto-Grading steps exceeds 5 minutes, you will get point deductions.
 			\item You are expected to only use \texttt{numpy} packages to implement the algorithms.
 			\item All questions assume that the data are not centered around zero. Therefore, you need to train the extra bias parameter in your code.

@@ -36,6 +36,8 @@
 \usepackage{wasysym}
 \usepackage{xmpmulti}
 \usepackage{url}
+\newcommand{\bTheta}{\bm{\Theta}}
+
 %\newcounter{propCounter} 
 
 \newtheorem{prop}{Proposition}
@@ -168,7 +170,7 @@
   \item Practical guide
   \end{itemize}  
 \end{frame}
-\section{Artificial neural network and libraries}
+\section{Artificial neural network as homework}
 \begin{frame}
 \frametitle{Artificial neural network}
 
@@ -178,6 +180,7 @@
 	\begin{figure}[!ht]
 		\centering
 		\includegraphics[width=4cm]{nn.png}
+		\caption{Three-layered neural network}
 	\end{figure}
 	\column{0.5\textwidth}
 
@@ -187,6 +190,26 @@
 \end{itemize}
 
 \end{columns}
+\end{frame}
+\begin{frame}
+\frametitle{Principles of neural network}
+Multilayer perceptron
+\begin{align*}
+h_0 &= x \\
+h_i &= \sigma(w_i \cdot h_{i-1} + b_i), i = 1, \dots, k \\
+\hat{y} &= \textrm{softmax}(w \cdot h_k + b)
+\end{align*}
+with loss function
+\begin{align*}
+\ell(w, b)
+= \sum_{i=1}^{m} \textrm{cross\_entropy}(y_i, \hat{y}_i)
+\end{align*}
+
+Use stochastic gradient descent to minimize $\ell(w, b)$:
+\begin{equation*}
+\ell(w, b)_{t+1} \leftarrow \ell(w, b)_t - \alpha \nabla \ell(w, b)_t
+\end{equation*}
+$\alpha: $ learning rate
 
 \end{frame}
 \begin{frame}{Implementing Neural Network as Homework}
@@ -215,7 +238,21 @@ The original description can be found at \url{http://cs231n.github.io/assignment
 %\item Lfdnn (This semester)
 \end{itemize}
 \end{frame}
-\section{Rank 2 tensor}
+\section{Learning from data neural network}
+\begin{frame}
+\textit{Learning from data}, a graduate course of Tsinghua Berkeley Shenzhen Institute
+
+\begin{block}{Programming Assignment 2}
+\begin{itemize}
+	\item Implement \textit{tensor} object
+	\item Use the tensor to build a multi-layer classifier model
+	\item Build a logistic regression and linear regression model
+\end{itemize}
+\begin{figure}
+	\includegraphics[width=4cm]{auto-grading.png}
+\end{figure}
+\end{block}
+\end{frame}
 \begin{frame}[fragile]{Rank 2 tensor}
 \begin{itemize}
 	\item another name for matrix
