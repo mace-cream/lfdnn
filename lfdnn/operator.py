@@ -104,6 +104,23 @@ class relu(tensor):
         local_gradient = (local_gradient > 0) * 1.0
         return local_gradient * self.back(target, feed)
 
+class constant(tensor):
+    '''constant tensor
+
+    Parameters
+    ----------
+    shape: list, shape of the tensor
+    value: for constant tensors, equal to the value of this tensor
+    '''    
+    def __init__(self, shape, value=0):
+        super().__init__(shape, NM.get('constant'))
+        self.value = value
+    def _eval(self, feed):
+        return self.value * np.ones(self.shape)
+    def _derivative(self, feed, input, target):
+        return np.zeros(self.shape) * self.back(target, feed)
+
+
 class log(tensor):
     '''tensor for matrix elementwise log function
 
@@ -120,7 +137,7 @@ class log(tensor):
     def _derivative(self, feed, input, target):
         return 1 / input.eval(feed) * self.back(target, feed)
 
-class abs(tensor):
+class absolute(tensor):
     '''tensor for absolute value function
 
     Parameters
@@ -179,6 +196,8 @@ class softmax(tensor):
     def _eval(self, feed):
         result = _softmax(self.input_list[0].eval(feed))
         return result
+    def _derivative(self, feed, input, target):
+        return 0 # not implemented
 
 class log_softmax(tensor):
     '''tensor for log softmax function
